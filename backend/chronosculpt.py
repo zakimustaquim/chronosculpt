@@ -1,11 +1,8 @@
-from flask import Flask, request, jsonify, send_from_directory, g
-from werkzeug.utils import secure_filename
+from flask import Flask, jsonify, g
 import psycopg2
 from psycopg2.extras import DictCursor
 from psycopg2.pool import SimpleConnectionPool
 import os
-from datetime import datetime
-import uuid
 from dotenv import load_dotenv
 
 # Load environment variables
