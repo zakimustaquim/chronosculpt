@@ -49,10 +49,15 @@ def close_db(error):
 
 
 # Initialize the database and create necessary tables
-def init_db():
+def init_db(reset=False):
     # Connect to database
     conn = psycopg2.connect(**DB_CONFIG)
     cursor = conn.cursor()
+
+    if (reset):
+        cursor.execute('drop table entries')
+        cursor.execute('drop table records')
+        cursor.execute('drop table habits')
     
     # Table to store habit data
     cursor.execute('''
@@ -61,7 +66,7 @@ def init_db():
             uid TEXT NOT NULL,
             name TEXT NOT NULL,
             comments TEXT NOT NULL,
-            preferredQuadrant INTEGER CHECK (preferredQuadrant BETWEEN 1 AND 4),
+            preferredQuadrant INTEGER CHECK (preferredQuadrant BETWEEN 0 AND 4),
             since TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             active BOOLEAN DEFAULT TRUE
         )
@@ -72,7 +77,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS records (
             rid SERIAL PRIMARY KEY,
             uid TEXT NOT NULL,
-            date TIMESTAMP NOT NULL,
+            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             q1notes TEXT NOT NULL,
             q2notes TEXT NOT NULL,
             q3notes TEXT NOT NULL,
@@ -98,10 +103,77 @@ def init_db():
     cursor.close()
     conn.close()
 
+@app.route('/habits/<user_id>/', methods=['GET'])
+def get_habits_by_user_id(user_id):
+    try:
+        g.cursor.execute('''
+            SELECT *
+            FROM habits
+            WHERE uid = %s
+        ''', (user_id,))
+
+        habits = g.cursor.fetchall()
+        result = {'habits': 
+                    [
+                        {
+                            'id': habit[0], 
+                            'uid': habit[1],
+                            'name': habit[2],
+                            'comments': habit[3],
+                            'preferredQuadrant': habit[4],
+                            'since': habit[5],
+                            'active': habit[6]
+                        } 
+                        for habit in habits
+                    ]
+                }
+        return jsonify(result), 200
+    
+    except Exception as e:
+            return jsonify({'error' : str(e)}), 500
+
+@app.route('/records/<user_id>/<int:timestamp>/')
+def get_records(user_id, timestamp):
+    try:
+        # sql
+        return
+
+    except Exception as e:
+            return jsonify({'error': str(e)}), 500
+        
+
 @app.route('/', methods=['GET'])
 def hello_world():
     return jsonify({'message': 'Hello world!'}), 200
 
+def insert_test_data():
+    conn = psycopg2.connect(**DB_CONFIG)
+    cursor = conn.cursor()
+
+    # Habits
+    cursor.execute('''
+        INSERT INTO habits (uid, name, comments, preferredQuadrant)
+        VALUES ('a23', 'Habit 1', 'Example comment for 1', 0);
+    ''')
+    cursor.execute('''
+        INSERT INTO habits (uid, name, comments, preferredQuadrant)
+        VALUES ('a23', 'Habit 2', 'Example comment for 2', 4);
+    ''')
+    cursor.execute('''
+        INSERT INTO habits (uid, name, comments, preferredQuadrant)
+        VALUES ('a22', 'Habit 3', 'Example comment for 3', 3);
+    ''')
+    cursor.execute('''
+        INSERT INTO habits (uid, name, comments, preferredQuadrant)
+        VALUES ('a21', 'Habit 4', 'Example comment for 4', 2);
+    ''')
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+
 if __name__ == '__main__':
-    init_db()
+    init_db(True)
+    insert_test_data()
     app.run(debug=True)
