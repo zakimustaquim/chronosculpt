@@ -220,10 +220,15 @@ def get_records_after_timestamp(user_id, timestamp):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/records/<int:record_id>/', methods=["PUT"])
+@app.route('/records/<int:record_id>/', methods=['PUT'])
 def update_record(record_id):
     # TODO
-    return jsonify({'message': record_id})
+    return
+
+@app.route('/entries/<int:entry_id>/', methods=['PUT'])
+def update_entry(entry_id):
+    # TODO
+    return
 
 @app.route('/records/<user_id>/', methods=['POST'])
 def create_record(user_id):
@@ -250,7 +255,7 @@ def create_record(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Expects 3 parameters - name, comments, and preferredQuadrant
+# Expects 3 parameters in JSON body - name, comments, and preferredQuadrant
 @app.route('/habits/<user_id>/', methods=['POST'])
 def add_habit(user_id):
     try:
@@ -259,7 +264,6 @@ def add_habit(user_id):
         comments = data.get('comments')
         preferred_quadrant = data.get('preferredQuadrant')
 
-        # insert row into records table
         g.cursor.execute('''
             INSERT INTO habits (uid, name, comments, preferredQuadrant)
             VALUES (%s, %s, %s, %s)
@@ -281,10 +285,43 @@ def add_habit(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Expects 4 parameters in JSON body - name, comments, preferredQuadrant, and active
 @app.route('/habits/<int:habit_id>/', methods=['PUT'])
 def update_habit(habit_id):
+    try:
+        data = request.get_json()
+        name = data.get('name')
+        comments = data.get('comments')
+        preferred_quadrant = data.get('preferredQuadrant')
+        active = data.get('active')
+
+        g.cursor.execute('''
+            UPDATE habits
+            SET name = %s, comments = %s, preferredquadrant = %s, active = %s
+            WHERE hid = %s
+            RETURNING *;
+        ''', (name, comments, preferred_quadrant, active, habit_id))
+
+        habit = g.cursor.fetchone()
+
+        result = {
+                    'hid': habit[0], 
+                    'uid': habit[1],
+                    'name': habit[2],
+                    'comments': habit[3],
+                    'preferredQuadrant': habit[4],
+                    'since': habit[5],
+                    'active': habit[6]
+                 } 
+        g.db.commit()
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/habits/<int:habit_id>/', methods=['DELETE'])
+def delete_habit(habit_id):
     # TODO
-    return jsonify({'message': habit_id})
+    return
 
 def insert_test_data():
     conn = psycopg2.connect(**DB_CONFIG)
