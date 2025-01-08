@@ -68,7 +68,7 @@ def init_db(reset=False):
             name TEXT NOT NULL,
             comments TEXT NOT NULL,
             preferredQuadrant INTEGER CHECK (preferredQuadrant BETWEEN 0 AND 4),
-            since TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            since TIMESTAMP DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'UTC'),
             active BOOLEAN DEFAULT TRUE
         )
     ''')
@@ -78,7 +78,7 @@ def init_db(reset=False):
         CREATE TABLE IF NOT EXISTS records (
             rid SERIAL PRIMARY KEY,
             uid TEXT NOT NULL,
-            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            date TIMESTAMP DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'UTC'),
             q1notes TEXT NOT NULL,
             q2notes TEXT NOT NULL,
             q3notes TEXT NOT NULL,
@@ -186,6 +186,40 @@ def get_entries_by_rid(rid):
                 for entry in entries
             ]
     return result
+
+# This function expects a timestamp in UTC.
+@app.route('/records/<user_id>/<int:timestamp>/', methods=['GET'])
+def get_records_after_timestamp(user_id, timestamp):
+    try:
+        dt = datetime.fromtimestamp(timestamp / 1000.0, timezone.utc)
+
+        g.cursor.execute('''
+            SELECT *
+            FROM records
+            WHERE uid = %s AND date >= %s AT TIME ZONE 'UTC'
+        ''', (user_id, dt,))
+        
+        records = g.cursor.fetchall()
+
+        result = {'records': 
+                    [
+                        {
+                            'rid': record[0],
+                            'uid': record[1],
+                            'date': record[2],
+                            'q1notes': record[3],
+                            'q2notes': record[4],
+                            'q3notes': record[5],
+                            'q4notes': record[6],
+                            'entries': get_entries_by_rid(record[0])
+                        } 
+                        for record in records
+                    ]
+                }
+        return jsonify(result), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/records/<int:record_id>/', methods=["PUT"])
 def update_record(record_id):
