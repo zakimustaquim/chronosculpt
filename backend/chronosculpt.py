@@ -220,10 +220,39 @@ def get_records_after_timestamp(user_id, timestamp):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Expects 4 parameters in JSON body - q1notes, q2notes, q3notes, q4notes
 @app.route('/records/<int:record_id>/', methods=['PUT'])
 def update_record(record_id):
-    # TODO
-    return
+    try:
+        data = request.get_json()
+        q1 = data.get('q1notes')
+        q2 = data.get('q2notes')
+        q3 = data.get('q3notes')
+        q4 = data.get('q4notes')
+
+        g.cursor.execute('''
+            UPDATE records
+            SET q1notes = %s, q2notes = %s, q3notes = %s, q4notes = %s
+            WHERE rid = %s
+            RETURNING *;
+        ''', (q1, q2, q3, q4, record_id))
+
+        record = g.cursor.fetchone()
+
+        result = {
+                    'rid': record[0],
+                    'uid': record[1],
+                    'date': record[2],
+                    'q1notes': record[3],
+                    'q2notes': record[4],
+                    'q3notes': record[5],
+                    'q4notes': record[6],
+                    'entries': get_entries_by_rid(record[0])
+                 } 
+        g.db.commit()
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/entries/<int:entry_id>/', methods=['PUT'])
 def update_entry(entry_id):
@@ -240,18 +269,30 @@ def create_record(user_id):
         g.cursor.execute('''
             INSERT INTO records (uid, q1notes, q2notes, q3notes, q4notes)
             VALUES (%s, '', '', '', '')
-            RETURNING rid;
+            RETURNING *;
         ''', (user_id,))
-        record_id = g.cursor.fetchone()[0]
+        record = g.cursor.fetchone()
+        record_id = record[0]
         
         for habit in habits:
             g.cursor.execute('''
                 INSERT INTO entries (rid, hid, comments, quadrant)
                 VALUES (%s, %s, %s, %s);
             ''', (record_id, habit['hid'], habit['comments'], habit['preferredQuadrant']))
+
+        result = {
+                    'rid': record[0],
+                    'uid': record[1],
+                    'date': record[2],
+                    'q1notes': record[3],
+                    'q2notes': record[4],
+                    'q3notes': record[5],
+                    'q4notes': record[6],
+                    'entries': get_entries_by_rid(record[0])
+                 } 
         
         g.db.commit()
-        return jsonify({'id': record_id})
+        return jsonify(result), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
