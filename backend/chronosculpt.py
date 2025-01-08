@@ -142,7 +142,6 @@ def get_all_records(user_id):
             WHERE uid = %s
         ''', (user_id,))
         records = g.cursor.fetchall()
-        print(records[0][2])
         result = {'records': 
                     [
                         {
@@ -223,6 +222,7 @@ def get_records_after_timestamp(user_id, timestamp):
 
 @app.route('/records/<int:record_id>/', methods=["PUT"])
 def update_record(record_id):
+    # TODO
     return jsonify({'message': record_id})
 
 @app.route('/records/<user_id>/', methods=['POST'])
@@ -250,17 +250,41 @@ def create_record(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/habits/<user_id>/add/', methods=['POST'])
+# Expects 3 parameters - name, comments, and preferredQuadrant
+@app.route('/habits/<user_id>/', methods=['POST'])
 def add_habit(user_id):
-    return jsonify({'message': user_id})
+    try:
+        data = request.get_json()
+        name = data.get('name')
+        comments = data.get('comments')
+        preferred_quadrant = data.get('preferredQuadrant')
+
+        # insert row into records table
+        g.cursor.execute('''
+            INSERT INTO habits (uid, name, comments, preferredQuadrant)
+            VALUES (%s, %s, %s, %s)
+            RETURNING *;
+        ''', (user_id, name, comments, preferred_quadrant))
+        habit = g.cursor.fetchone()
+
+        result = {
+                    'hid': habit[0], 
+                    'uid': habit[1],
+                    'name': habit[2],
+                    'comments': habit[3],
+                    'preferredQuadrant': habit[4],
+                    'since': habit[5],
+                    'active': habit[6]
+                 } 
+        g.db.commit()
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/habits/<int:habit_id>/', methods=['PUT'])
 def update_habit(habit_id):
+    # TODO
     return jsonify({'message': habit_id})
-
-@app.route('/', methods=['GET'])
-def hello_world():
-    return jsonify({'message': 'Hello world!'}), 200
 
 def insert_test_data():
     conn = psycopg2.connect(**DB_CONFIG)
