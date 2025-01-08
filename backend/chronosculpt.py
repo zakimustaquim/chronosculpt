@@ -320,8 +320,20 @@ def update_habit(habit_id):
 
 @app.route('/habits/<int:habit_id>/', methods=['DELETE'])
 def delete_habit(habit_id):
-    # TODO
-    return
+    try:
+        g.cursor.execute('''
+            DELETE FROM habits 
+            WHERE hid = %s
+            returning hid;
+        ''', [habit_id])
+        hid = g.cursor.fetchone()[0]
+
+        g.db.commit()
+        return jsonify({'deleted_id': hid}), 200
+    except TypeError as te:
+        return jsonify({'error': 'No habits were found matching the criteria'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 def insert_test_data():
     conn = psycopg2.connect(**DB_CONFIG)
