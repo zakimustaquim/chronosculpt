@@ -254,10 +254,40 @@ def update_record(record_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Expects 5 parameters in JSON body - comments, done, quadrant, doneAt, and split
 @app.route('/entries/<int:entry_id>/', methods=['PUT'])
 def update_entry(entry_id):
-    # TODO
-    return
+    try:
+        data = request.get_json()
+        comments = data.get('comments')
+        done = data.get('done')
+        quadrant = data.get('quadrant')
+        done_at = data.get('doneAt')
+        split = data.get('split')
+
+        g.cursor.execute('''
+            UPDATE entries
+            SET comments = %s, done = %s, quadrant = %s, doneAt = %s, split = %s
+            WHERE eid = %s
+            RETURNING *;
+        ''', (comments, done, quadrant, done_at, split, entry_id))
+
+        entry = g.cursor.fetchone()
+
+        result = {
+                    'eid': entry[0],
+                    'rid': entry[1],
+                    'hid': entry[2],
+                    'comments': entry[3],
+                    'done': entry[4],
+                    'quadrant': entry[5],
+                    'doneAt': entry[6],
+                    'split': entry[7]
+                 } 
+        g.db.commit()
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/records/<user_id>/', methods=['POST'])
 def create_record(user_id):
