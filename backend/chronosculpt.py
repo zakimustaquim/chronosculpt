@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, g, request
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import psycopg2
 from psycopg2.extras import DictCursor
 from psycopg2.pool import SimpleConnectionPool
@@ -292,15 +292,18 @@ def update_entry(entry_id):
 @app.route('/records/<user_id>/', methods=['POST'])
 def create_record(user_id):
     try:
+        date = datetime.today()
+        start_of_day = datetime(date.year, date.month, date.day) + timedelta(hours=4)
+
         habits_response, status_code = get_habits_by_user_id(user_id)
         habits = habits_response.get_json()['habits']
 
         # insert row into records table
         g.cursor.execute('''
-            INSERT INTO records (uid, q1notes, q2notes, q3notes, q4notes)
-            VALUES (%s, '', '', '', '')
+            INSERT INTO records (uid, q1notes, q2notes, q3notes, q4notes, date)
+            VALUES (%s, '', '', '', '', %s)
             RETURNING *;
-        ''', (user_id,))
+        ''', (user_id, start_of_day))
         record = g.cursor.fetchone()
         record_id = record[0]
         
@@ -403,6 +406,15 @@ def delete_habit(habit_id):
         return jsonify({'deleted_id': hid}), 200
     except TypeError as te:
         return jsonify({'error': 'No habits were found matching the criteria'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/', methods=['POST'])
+def test():
+    try:
+        data = request.get_json()
+        print(data.get('test'))
+        return jsonify({'message': 'success'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
