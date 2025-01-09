@@ -1,9 +1,32 @@
+// ignore_for_file: avoid_print
+
 import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
+import 'package:chronosculpt/data_structures.dart';
 import 'dart:convert';
 
 void main() {
   const String baseUrl = 'http://localhost:5000';
+
+  group('POST /records/<user_id/ tests', () {
+    test('posting a new record should return the new record', () async {
+      final response = await http.post(Uri.parse('$baseUrl/records/a23/'));
+      expect(response.statusCode, equals(200));
+
+      final Map<String, dynamic> data = json.decode(response.body);
+      expect(data['entries'], isA<List>());
+      expect(data['rid'], isA<int>());
+      expect(data['uid'], isA<String>());
+      expect(data['date'], isA<String>());
+      expect(data['q1notes'], isA<String>());
+      expect(data['q2notes'], isA<String>());
+      expect(data['q3notes'], isA<String>());
+      expect(data['q4notes'], isA<String>());
+
+      Record r = Record.fromMap(data);
+      print(r);
+    });
+  });
 
   group('GET /habits/<user_id>/ tests', () {
     test('should return habits for user with multiple habits', () async {
@@ -46,7 +69,8 @@ void main() {
     });
 
     test('should return empty list for non-existent user', () async {
-      final response = await http.get(Uri.parse('$baseUrl/habits/non_existent_user/'));
+      final response =
+          await http.get(Uri.parse('$baseUrl/habits/non_existent_user/'));
       expect(response.statusCode, equals(200));
 
       final Map<String, dynamic> data = json.decode(response.body);
