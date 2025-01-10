@@ -183,7 +183,7 @@ class _CurrentDayWidgetState extends State<CurrentDayWidget> {
                 );
               },
             ),
-          )
+          ),
         ],
       ),
     );

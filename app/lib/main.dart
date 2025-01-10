@@ -1,3 +1,4 @@
+import 'package:chronosculpt/widgets/habit_list.dart';
 import 'package:chronosculpt/widgets/log.dart';
 import 'package:flutter/material.dart';
 
@@ -66,7 +67,7 @@ class _MainWidgetState extends State<MainWidget> {
         page = const Placeholder();
         break;
       case 2:
-        page = const Placeholder();
+        page = const HabitListWrapper();
         break;
       case 3:
         page = const Placeholder();

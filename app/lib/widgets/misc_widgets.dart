@@ -30,7 +30,7 @@ class HabitCard extends StatefulWidget {
   final String title;
   final String comments;
   final Function onTap;
-  final Function onLongPress;
+  final VoidCallback? onLongPress;
   final Widget topRightWidget;
   final bool show;
 
@@ -41,7 +41,7 @@ class HabitCard extends StatefulWidget {
     required this.title,
     required this.comments,
     required this.onTap,
-    required this.onLongPress,
+    this.onLongPress,
     required this.topRightWidget,
     this.show = true,
   });
@@ -67,7 +67,7 @@ class _HabitCardState extends State<HabitCard> {
           () => scale = hovering ? 0.92 : 1,
         ),
         onTap: () => widget.onTap(),
-        onLongPress: () => widget.onLongPress(),
+        onLongPress: widget.onLongPress,
         child: AnimatedContainer(
           transform: Matrix4.identity()..scale(scale),
           transformAlignment: FractionalOffset.center,

@@ -118,6 +118,50 @@ class Dialogs {
       },
     );
   }
+
+  static Future<bool?> showDeleteConfirmationDialog(
+      {required BuildContext context}) async {
+    var colorScheme = Theme.of(context).colorScheme;
+
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: colorScheme.onError,
+          title: const Text('Are you sure?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                const Text('This action will permanently delete this habit.'),
+                const Text('This cannot be undone.'),
+                const Text('It will be all gone like December 19 2029.'),
+                Icon(Icons.emoji_emotions, color: colorScheme.error),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.error,
+              ),
+              child: Text('Delete',
+                  style: TextStyle(color: colorScheme.errorContainer)),
+              onPressed: () async {
+                Navigator.of(dialogContext).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class QuadrantDropdown extends StatefulWidget {
