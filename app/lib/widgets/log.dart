@@ -1,3 +1,4 @@
+import 'package:chronosculpt/widgets/dialogs.dart';
 import 'package:chronosculpt/widgets/stopwatch.dart';
 import 'package:flutter/material.dart';
 import 'package:chronosculpt/main.dart';
@@ -66,15 +67,33 @@ class _CurrentDayWidgetState extends State<CurrentDayWidget> {
   String searchQuery = "";
   var controller = TextEditingController();
 
-  Future<void> onEdit(
-      {required BuildContext context, required Entry entry}) async {
-    //
+  Future<void> onEdit({
+    required BuildContext context,
+    required Entry entry,
+  }) async {
+    var userInput = await Dialogs.showEditDialog(
+      context: context,
+      title: 'Edit Habit Details',
+      showQuadrantSelection: false,
+      initialQuadrant: 0,
+      initialValue1: entry.habitName,
+      initialValue2: entry.comments,
+    );
+
+    if (userInput != null &&
+        userInput.first != null &&
+        userInput.second != null) {
+      entry.habitName = userInput.first!;
+      entry.comments = userInput.second!;
+      await DatabaseHelper().updateEntry(entry);
+      setState(() => {});
+    }
   }
 
   Future<void> onComplete(Entry e, bool? newStatus) async {
     if (newStatus == null) return;
     e.done = newStatus;
-    e = await DatabaseHelper().updateEntry(e);
+    await DatabaseHelper().updateEntry(e);
     setState(() => {});
   }
 
@@ -82,10 +101,6 @@ class _CurrentDayWidgetState extends State<CurrentDayWidget> {
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
     List<Entry> entries = widget.recordsList[0].entries;
-    /*
-    entries.removeWhere((data) =>
-        !data.habitName.toLowerCase().contains(searchQuery.toLowerCase()) &&
-        !data.comments.toLowerCase().contains(searchQuery.toLowerCase())); */
 
     return Scaffold(
       backgroundColor: colorScheme.secondary,

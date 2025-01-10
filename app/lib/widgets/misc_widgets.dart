@@ -66,8 +66,8 @@ class _HabitCardState extends State<HabitCard> {
         onHighlightChanged: (hovering) => setState(
           () => scale = hovering ? 0.92 : 1,
         ),
-        onTap: () => widget.onTap,
-        onLongPress: () => widget.onLongPress,
+        onTap: () => widget.onTap(),
+        onLongPress: () => widget.onLongPress(),
         child: AnimatedContainer(
           transform: Matrix4.identity()..scale(scale),
           transformAlignment: FractionalOffset.center,
