@@ -28,9 +28,10 @@ class Habit {
       active: habit['active'],
     );
   }
-  
+
   @override
-  String toString() => '$hid | $uid | $name | $comments | $preferredQuadrant | $since | $active';
+  String toString() =>
+      '$hid | $uid | $name | $comments | $preferredQuadrant | $since | $active';
 }
 
 class Entry {
@@ -81,7 +82,8 @@ class Entry {
   }
 
   @override
-  String toString() => '$eid - $rid - $hid - $habitName - $comments - $done - $quadrant - $doneAt - $split';
+  String toString() =>
+      '$eid - $rid - $hid - $habitName - $comments - $done - $quadrant - $doneAt - $split';
 }
 
 class Record {
@@ -125,7 +127,8 @@ class Record {
   }
 
   @override
-  String toString() => '$rid | $uid | $date | $entries | $q1notes | $q2notes | $q3notes | $q4notes';
+  String toString() =>
+      '$rid | $uid | $date | $entries | $q1notes | $q2notes | $q3notes | $q4notes';
 }
 
 // parses a String as returned from the API into a DateTime object
@@ -142,14 +145,8 @@ DateTime parseString(String s) {
   int minute = int.parse(tokens[1]);
   int second = int.parse(tokens[2]);
 
-  return DateTime(
-    year,
-    month,
-    day,
-    hour,
-    minute,
-    second
-  );
+  DateTime date = DateTime.utc(year, month, day, hour, minute, second);
+  return date.toLocal();
 }
 
 // The input string should be an abbreviation as in Python's dt toString call
@@ -188,7 +185,8 @@ class MonthNotFoundException implements Exception {
   final String message;
   final String invalidValue;
 
-  MonthNotFoundException({this.invalidValue = '', this.message = 'Month could not be parsed'});
+  MonthNotFoundException(
+      {this.invalidValue = '', this.message = 'Month could not be parsed'});
 
   @override
   String toString() => '$message: $invalidValue';

@@ -266,10 +266,12 @@ def update_entry(entry_id):
         split = data.get('split')
 
         g.cursor.execute('''
-            UPDATE entries
+            SET TIME ZONE 'UTC';
+            UPDATE entries e
             SET comments = %s, done = %s, quadrant = %s, doneAt = %s, split = %s
-            WHERE eid = %s
-            RETURNING *;
+            FROM habits h
+            WHERE e.eid = %s AND h.hid = e.hid
+            RETURNING e.*, h.name AS habit_name;
         ''', (comments, done, quadrant, done_at, split, entry_id))
 
         entry = g.cursor.fetchone()
@@ -282,7 +284,8 @@ def update_entry(entry_id):
                     'done': entry[4],
                     'quadrant': entry[5],
                     'doneAt': entry[6],
-                    'split': entry[7]
+                    'split': entry[7],
+                    'habit_name': entry[8]
                  } 
         g.db.commit()
         return jsonify(result), 200
@@ -300,6 +303,7 @@ def create_record(user_id):
 
         # insert row into records table
         g.cursor.execute('''
+            SET TIME ZONE 'UTC';
             INSERT INTO records (uid, q1notes, q2notes, q3notes, q4notes, date)
             VALUES (%s, '', '', '', '', %s)
             RETURNING *;
@@ -330,7 +334,7 @@ def create_record(user_id):
         return jsonify({'error': str(e)}), 500
 
 # Expects 3 parameters in JSON body - name, comments, and preferredQuadrant
-@app.route('/habits/<user_id>/', methods=['POST'])
+@app.route('/habits/<user_id>/add/', methods=['POST'])
 def add_habit(user_id):
     try:
         data = request.get_json()

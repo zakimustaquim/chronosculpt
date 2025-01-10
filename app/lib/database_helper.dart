@@ -41,6 +41,9 @@ class DatabaseHelper {
 
   Future<List<Record>> getRecordsForCurrentDay(String uid) async {
     // TODO - calculate timestamp
+    // Idea - calculate timestamp as you would put it into Firebase
+    // and then convert to UTC
+    var date = DateTime.now().toUtc();
     return await getRecordsByTimestamp(uid, 0);
   }
 
@@ -69,8 +72,42 @@ class DatabaseHelper {
   }
 
   Future<Entry> updateEntry(Entry e) async {
-    // TODO
-    throw Exception();
+    var requestBody = {
+      'comments': e.comments,
+      'done': e.done,
+      'quadrant': e.quadrant,
+      'doneAt': e.doneAt,
+      'split': e.split
+    };
+
+    final response = await http.put(
+      Uri.parse('$backendPath/entries/${e.eid}/'),
+      body: json.encode(requestBody),
+      headers: headers,
+    );
+    checkResponse(response);
+
+    final Map<String, dynamic> data = json.decode(response.body);
+    return Entry.fromMap(data);
+  }
+
+  Future<Habit> updateHabit(Habit h) async {
+    var requestBody = {
+      'name': h.name,
+      'comments': h.comments,
+      'preferredQuadrant': h.preferredQuadrant,
+      'active': h.active,
+    };
+
+    final response = await http.put(
+      Uri.parse('$backendPath/habits/${h.hid}/'),
+      body: json.encode(requestBody),
+      headers: headers,
+    );
+    checkResponse(response);
+
+    final Map<String, dynamic> data = json.decode(response.body);
+    return Habit.fromMap(data);
   }
 
   Future<Record> createRecordForCurrentDay(String uid) async {
@@ -81,8 +118,33 @@ class DatabaseHelper {
     return Record.fromMap(data);
   }
 
+  Future<Habit> createHabit(
+    String uid, {
+    required String name,
+    required String comments,
+    required int preferredQuadrant,
+  }) async {
+    var requestBody = {
+      'name': name,
+      'comments': comments,
+      'preferredQuadrant': preferredQuadrant,
+    };
+
+    final response = await http.post(
+      Uri.parse('$backendPath/habits/$uid/add/'),
+      body: json.encode(requestBody),
+      headers: headers,
+    );
+    checkResponse(response);
+
+    final Map<String, dynamic> data = json.decode(response.body);
+    return Habit.fromMap(data);
+  }
+
   Future<void> deleteHabit(Habit h) async {
-    // TODO
+    final response =
+        await http.delete(Uri.parse('$backendPath/habits/${h.hid}/'));
+    checkResponse(response);
   }
 
   void checkResponse(http.Response response) {
