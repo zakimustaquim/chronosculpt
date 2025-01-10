@@ -146,7 +146,7 @@ DateTime parseString(String s) {
   int second = int.parse(tokens[2]);
 
   DateTime date = DateTime.utc(year, month, day, hour, minute, second);
-  return date.toLocal();
+  return date; // keep in utc for now
 }
 
 // The input string should be an abbreviation as in Python's dt toString call

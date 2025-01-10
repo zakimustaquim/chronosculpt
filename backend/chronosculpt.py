@@ -79,10 +79,10 @@ def init_db(reset=False):
             rid SERIAL PRIMARY KEY,
             uid TEXT NOT NULL,
             date TIMESTAMP DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'UTC'),
-            q1notes TEXT NOT NULL,
-            q2notes TEXT NOT NULL,
-            q3notes TEXT NOT NULL,
-            q4notes TEXT NOT NULL
+            q1notes TEXT NOT NULL DEFAULT '',
+            q2notes TEXT NOT NULL DEFAULT '',
+            q3notes TEXT NOT NULL DEFAULT '',
+            q4notes TEXT NOT NULL DEFAULT ''
         )
     ''')
 
@@ -187,9 +187,10 @@ def get_entries_by_rid(rid):
     return result
 
 # This function expects a timestamp in UTC.
-@app.route('/records/<user_id>/<int:timestamp>/', methods=['GET'])
+@app.route('/records/<user_id>/<timestamp>/', methods=['GET'])
 def get_records_after_timestamp(user_id, timestamp):
     try:
+        timestamp = int(timestamp) 
         dt = datetime.fromtimestamp(timestamp / 1000.0, timezone.utc)
 
         g.cursor.execute('''
@@ -301,11 +302,25 @@ def create_record(user_id):
         habits_response, status_code = get_habits_by_user_id(user_id)
         habits = habits_response.get_json()['habits']
 
+        # If the user has no habits, avoid making an empty record
+        if len(habits) == 0:
+            return jsonify({'error' : 'The user does not have any habits.'}), 406
+        
+        # Check if a record already exists for today (should only be 1 per day)
+        g.cursor.execute('''
+            SELECT rid
+            FROM records
+            WHERE uid = %s AND date >= %s AT TIME ZONE 'UTC'
+        ''', (user_id, start_of_day))
+        current_records = g.cursor.fetchall()
+        if len(current_records) != 0:
+            return jsonify({'error' : 'The user already has a record for today.'}), 400
+
         # insert row into records table
         g.cursor.execute('''
             SET TIME ZONE 'UTC';
-            INSERT INTO records (uid, q1notes, q2notes, q3notes, q4notes, date)
-            VALUES (%s, '', '', '', '', %s)
+            INSERT INTO records (uid, date)
+            VALUES (%s, %s)
             RETURNING *;
         ''', (user_id, start_of_day))
         record = g.cursor.fetchone()
@@ -443,6 +458,57 @@ def insert_test_data():
         INSERT INTO habits (uid, name, comments, preferredQuadrant)
         VALUES ('a21', 'Habit 4', 'Example comment for 4', 2);
     ''')
+
+    date = datetime.today()
+    start_of_day_today = datetime(date.year, date.month, date.day) + timedelta(hours=4)
+    start_of_day_yesterday = datetime(date.year, date.month, date.day) + timedelta(hours=4) - timedelta(days=1)
+    start_of_day_21_days_ago = datetime(date.year, date.month, date.day) + timedelta(hours=4) - timedelta(days=21)
+    start_of_day_29_days_ago = datetime(date.year, date.month, date.day) + timedelta(hours=4) - timedelta(days=29)
+    start_of_day_30_days_ago = datetime(date.year, date.month, date.day) + timedelta(hours=4) - timedelta(days=30)
+    start_of_day_31_days_ago = datetime(date.year, date.month, date.day) + timedelta(hours=4) - timedelta(days=31)
+    start_of_day_60_days_ago = datetime(date.year, date.month, date.day) + timedelta(hours=4) - timedelta(days=60)
+
+    cursor.execute('''
+        SET TIME ZONE 'UTC';
+        INSERT INTO records (uid, date)
+        VALUES ('a23', %s);
+    ''', ([start_of_day_today,]))
+
+    cursor.execute('''
+        SET TIME ZONE 'UTC';
+        INSERT INTO records (uid, date)
+        VALUES ('a23', %s);
+    ''', ([start_of_day_yesterday,]))
+
+    cursor.execute('''
+        SET TIME ZONE 'UTC';
+        INSERT INTO records (uid, date)
+        VALUES ('a23', %s);
+    ''', ([start_of_day_21_days_ago,]))
+
+    cursor.execute('''
+        SET TIME ZONE 'UTC';
+        INSERT INTO records (uid, date)
+        VALUES ('a23', %s);
+    ''', ([start_of_day_29_days_ago,]))
+
+    cursor.execute('''
+        SET TIME ZONE 'UTC';
+        INSERT INTO records (uid, date)
+        VALUES ('a23', %s);
+    ''', ([start_of_day_30_days_ago,]))
+
+    cursor.execute('''
+        SET TIME ZONE 'UTC';
+        INSERT INTO records (uid, date)
+        VALUES ('a23', %s);
+    ''', ([start_of_day_31_days_ago]))
+
+    cursor.execute('''
+        SET TIME ZONE 'UTC';
+        INSERT INTO records (uid, date)
+        VALUES ('a23', %s);
+    ''', ([start_of_day_60_days_ago]))
 
     conn.commit()
     cursor.close()

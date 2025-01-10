@@ -40,16 +40,17 @@ class DatabaseHelper {
   }
 
   Future<List<Record>> getRecordsForCurrentDay(String uid) async {
-    // TODO - calculate timestamp
-    // Idea - calculate timestamp as you would put it into Firebase
-    // and then convert to UTC
-    var date = DateTime.now().toUtc();
-    return await getRecordsByTimestamp(uid, 0);
+    var date = DateTime.now().subtract(const Duration(days: 1));
+    return await getRecordsByTimestamp(uid, date.millisecondsSinceEpoch);
   }
 
   Future<List<Record>> getPast30Days(String uid) async {
-    // TODO - calculate timestamp
-    return await getRecordsByTimestamp(uid, 0);
+    var date = DateTime.now().subtract(const Duration(days: 31));
+    var recordsList =
+        await getRecordsByTimestamp(uid, date.millisecondsSinceEpoch);
+    recordsList
+        .removeWhere((element) => element.date.day == DateTime.now().day);
+    return recordsList;
   }
 
   Future<Record> updateRecord(Record r) async {
@@ -149,9 +150,15 @@ class DatabaseHelper {
 
   void checkResponse(http.Response response) {
     switch (response.statusCode) {
+      case 400:
+        throw DatabaseTransactionException(
+            invalidValue: '400, ${response.body}');
       case 404:
         throw DatabaseTransactionException(
             invalidValue: '404, ${response.body}');
+      case 406:
+        throw DatabaseTransactionException(
+            invalidValue: '406, ${response.body}');
       case 500:
         throw DatabaseTransactionException(
             invalidValue: '500, ${response.body}');
