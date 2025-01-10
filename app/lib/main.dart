@@ -20,11 +20,10 @@ String getCurrentUserUid() {
   return 'a23';
 }
 
-void showSnackBar(String s) {
-  if (_MainWidgetState.applicationContext != null) return;
+void showSnackBar(BuildContext context, String s) {
+  if (!context.mounted) return;
 
-  ScaffoldMessenger.of(_MainWidgetState.applicationContext!)
-      .showSnackBar(SnackBar(content: Text(s)));
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s)));
 }
 
 class ChronosculptApp extends StatelessWidget {

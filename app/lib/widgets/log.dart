@@ -26,7 +26,7 @@ class _LogWidgetState extends State<LogWidget> {
         }
 
         if (snapshot.hasError) {
-          return ErrorScreen(snapshot: snapshot);
+          return SnapshotErrorScreen(snapshot: snapshot);
         }
 
         if (snapshot.data != null && snapshot.data!.isNotEmpty) {
@@ -34,24 +34,65 @@ class _LogWidgetState extends State<LogWidget> {
             recordsList: snapshot.data!,
           );
         } else {
-          return NoRecordFoundWidget();
+          return NoRecordFoundWidget(
+            refresher: () => setState(() {}),
+          );
         }
       },
     );
   }
 }
 
-class NoRecordFoundWidget extends StatefulWidget {
-  const NoRecordFoundWidget({super.key});
+class NoRecordFoundWidget extends StatelessWidget {
+  final Function refresher;
+  const NoRecordFoundWidget({super.key, required this.refresher});
 
-  @override
-  State<NoRecordFoundWidget> createState() => _NoRecordFoundWidgetState();
-}
+  Future<void> onAddRecord(BuildContext context) async {
+    try {
+      await DatabaseHelper().createRecordForCurrentDay(getCurrentUserUid());
+      refresher();
+    } on DatabaseTransactionException catch (dte) {
+      if (dte.errorCode == 406) {
+          Dialogs.showAlertDialog(context,
+              'Please add at least one habit before creating a daily record.');
+      } else {
+        showSnackBar(context, dte.toString());
+      }
+    } catch (e) {
+      showSnackBar(context, e.toString());
+    }
+  }
 
-class _NoRecordFoundWidgetState extends State<NoRecordFoundWidget> {
   @override
   Widget build(BuildContext context) {
-    return const Text('hi');
+    var colorScheme = Theme.of(context).colorScheme;
+
+    return Scaffold(
+      backgroundColor: colorScheme.secondary,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              'No record found for today',
+              style: TextStyle(
+                  color: colorScheme.surfaceContainerLowest, fontSize: 20.0),
+            ),
+            const SizedBox(height: 16.0),
+            ElevatedButton(
+              child: const Text('Recheck'),
+              onPressed: () => refresher(),
+            )
+          ],
+        ),
+      ),
+      floatingActionButton: ChronosculptFloatingActionButton(
+        onPressed: () => onAddRecord(context),
+        colorScheme: colorScheme,
+        icon: Icon(Icons.add),
+      ),
+    );
   }
 }
 

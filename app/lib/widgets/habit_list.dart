@@ -25,16 +25,16 @@ class _HabitListWrapperState extends State<HabitListWrapper> {
         }
 
         if (snapshot.hasError) {
-          return ErrorScreen(snapshot: snapshot);
+          return SnapshotErrorScreen(snapshot: snapshot);
         }
 
-        if (snapshot.data != null && snapshot.data!.isNotEmpty) {
+        if (snapshot.data != null) {
           return HabitListWidget(
             habits: snapshot.data!,
           );
-        } else {
-          return Placeholder();
         }
+
+        return ErrorScreen(message: 'The data was unexpectedly null.');
       },
     );
   }
@@ -64,7 +64,7 @@ class _HabitListWidgetState extends State<HabitListWidget> {
         await DatabaseHelper().deleteHabit(habit);
         habitsList.removeWhere((element) => element == habit);
       } catch (e) {
-        showSnackBar(e.toString());
+        showSnackBar(context, e.toString());
       }
     }
     setState(() {});
@@ -119,7 +119,7 @@ class _HabitListWidgetState extends State<HabitListWidget> {
         );
         setState(() => habitsList.add(h));
       } catch (e) {
-        showSnackBar(e.toString());
+        showSnackBar(context, e.toString());
       }
     }
   }
@@ -168,42 +168,44 @@ class _HabitListWidgetState extends State<HabitListWidget> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: widget.habits.length,
-              itemBuilder: (context, i) {
-                final habit = widget.habits[i];
-                return HabitCard(
-                  backgroundColor: colorScheme.secondary,
-                  textColor: colorScheme.surface,
-                  title: habit.name,
-                  comments: habit.comments,
-                  onTap: () => onEdit(context: context, habit: habit),
-                  show: habit.name
-                          .toLowerCase()
-                          .contains(searchQuery.toLowerCase()) ||
-                      habit.comments
-                          .toLowerCase()
-                          .contains(searchQuery.toLowerCase()),
-                  topRightWidget: Transform.scale(
-                    scale: 1,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        // fixedSize: Size(24.0, 24.0),
-                        shape: const CircleBorder(),
-                      ),
-                      onPressed: () => onDelete(
-                          context: context,
-                          habit: habit,
-                          habitsList: widget.habits),
-                      child: const Icon(
-                        Icons.delete,
-                        size: 24,
-                      ),
-                    ),
+            child: widget.habits.isEmpty
+                ? Center(child: Text('No habits found'))
+                : ListView.builder(
+                    itemCount: widget.habits.length,
+                    itemBuilder: (context, i) {
+                      final habit = widget.habits[i];
+                      return HabitCard(
+                        backgroundColor: colorScheme.secondary,
+                        textColor: colorScheme.surface,
+                        title: habit.name,
+                        comments: habit.comments,
+                        onTap: () => onEdit(context: context, habit: habit),
+                        show: habit.name
+                                .toLowerCase()
+                                .contains(searchQuery.toLowerCase()) ||
+                            habit.comments
+                                .toLowerCase()
+                                .contains(searchQuery.toLowerCase()),
+                        topRightWidget: Transform.scale(
+                          scale: 1,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              // fixedSize: Size(24.0, 24.0),
+                              shape: const CircleBorder(),
+                            ),
+                            onPressed: () => onDelete(
+                                context: context,
+                                habit: habit,
+                                habitsList: widget.habits),
+                            child: const Icon(
+                              Icons.delete,
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           )
         ],
       ),

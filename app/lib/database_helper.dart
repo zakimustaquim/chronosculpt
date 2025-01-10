@@ -152,29 +152,31 @@ class DatabaseHelper {
     switch (response.statusCode) {
       case 400:
         throw DatabaseTransactionException(
-            invalidValue: '400, ${response.body}');
+            errorCode: 400, invalidValue: response.body);
       case 404:
         throw DatabaseTransactionException(
-            invalidValue: '404, ${response.body}');
+            errorCode: 404, invalidValue: response.body);
       case 406:
         throw DatabaseTransactionException(
-            invalidValue: '406, ${response.body}');
+            errorCode: 406, invalidValue: response.body);
       case 500:
         throw DatabaseTransactionException(
-            invalidValue: '500, ${response.body}');
+            errorCode: 500, invalidValue: response.body);
     }
   }
 }
 
 class DatabaseTransactionException {
+  int errorCode;
   String? message;
   String? invalidValue;
 
   DatabaseTransactionException({
+    required this.errorCode,
     this.message = "The database response contained an error",
     this.invalidValue = "",
   });
 
   @override
-  String toString() => "$message: $invalidValue";
+  String toString() => "$message: $errorCode, $invalidValue";
 }

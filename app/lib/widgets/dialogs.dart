@@ -160,6 +160,36 @@ class Dialogs {
       },
     );
   }
+
+  /// Shows a dialog displaying a given message to the user.
+  static Future<void> showAlertDialog(BuildContext context, String message) async {
+    if (!context.mounted) return;
+    
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(message),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Dismiss'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class QuadrantDropdown extends StatefulWidget {

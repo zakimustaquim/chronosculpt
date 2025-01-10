@@ -9,15 +9,30 @@ class LoadingScreen extends StatelessWidget {
   }
 }
 
-class ErrorScreen extends StatelessWidget {
+class SnapshotErrorScreen extends StatelessWidget {
   final AsyncSnapshot snapshot;
-  const ErrorScreen({super.key, required this.snapshot});
+  const SnapshotErrorScreen({super.key, required this.snapshot});
 
   @override
   Widget build(BuildContext context) {
     return SelectionArea(
       child: Text(
-        "Error loading records: ${snapshot.error}",
+        "Error loading data: ${snapshot.error}",
+        style: TextStyle(color: Theme.of(context).colorScheme.error),
+      ),
+    );
+  }
+}
+
+class ErrorScreen extends StatelessWidget {
+  final String message;
+  const ErrorScreen({super.key, required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return SelectionArea(
+      child: Text(
+        "Error loading data: $message",
         style: TextStyle(color: Theme.of(context).colorScheme.error),
       ),
     );
