@@ -127,6 +127,25 @@ class _HabitCardState extends State<HabitCard> {
   }
 }
 
+class ChronosculptFloatingActionButton extends FloatingActionButton {
+  ChronosculptFloatingActionButton({
+    super.key,
+    required super.onPressed,
+    required ColorScheme colorScheme,
+    required Icon icon,
+  }) : super(
+          backgroundColor: colorScheme.shadow,
+          foregroundColor: colorScheme.tertiaryContainer,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(120.0),
+          ),
+          child: const Icon(
+            Icons.add,
+            size: 32,
+          ),
+        );
+}
+
 class HabitCardOld extends StatefulWidget {
   final Color textColor;
   final Color backgroundColor;

@@ -70,8 +70,10 @@ class _HabitListWidgetState extends State<HabitListWidget> {
     setState(() {});
   }
 
-  Future<void> onEdit(
-      {required BuildContext context, required Habit habit}) async {
+  Future<void> onEdit({
+    required BuildContext context,
+    required Habit habit,
+  }) async {
     var userInput = await Dialogs.showEditDialog(
       context: context,
       title: 'Edit Habit Details',
@@ -93,12 +95,46 @@ class _HabitListWidgetState extends State<HabitListWidget> {
     }
   }
 
+  Future<void> onAdd(BuildContext context, List<Habit> habitsList) async {
+    var userInput = await Dialogs.showEditDialog(
+      context: context,
+      title: 'Add New Habit',
+      showQuadrantSelection: true,
+      initialQuadrant: 0,
+    );
+
+    if (userInput != null &&
+        userInput.first != null &&
+        userInput.second != null &&
+        userInput.preferredQuadrant != null) {
+      var name = userInput.first!;
+      var comments = userInput.second!;
+      var preferredQuadrant = userInput.preferredQuadrant!;
+      try {
+        Habit h = await DatabaseHelper().createHabit(
+          getCurrentUserUid(),
+          name: name,
+          comments: comments,
+          preferredQuadrant: preferredQuadrant,
+        );
+        setState(() => habitsList.add(h));
+      } catch (e) {
+        showSnackBar(e.toString());
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
+      floatingActionButton: ChronosculptFloatingActionButton(
+        onPressed: () => onAdd(context, widget.habits),
+        colorScheme: colorScheme,
+        icon: Icon(Icons.add),
+      ),
       body: Column(
         children: [
           Padding(
@@ -155,7 +191,10 @@ class _HabitListWidgetState extends State<HabitListWidget> {
                         // fixedSize: Size(24.0, 24.0),
                         shape: const CircleBorder(),
                       ),
-                      onPressed: () => onDelete(context: context, habit: habit, habitsList: widget.habits),
+                      onPressed: () => onDelete(
+                          context: context,
+                          habit: habit,
+                          habitsList: widget.habits),
                       child: const Icon(
                         Icons.delete,
                         size: 24,

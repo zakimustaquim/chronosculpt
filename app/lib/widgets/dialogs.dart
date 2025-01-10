@@ -135,8 +135,6 @@ class Dialogs {
               children: <Widget>[
                 const Text('This action will permanently delete this habit.'),
                 const Text('This cannot be undone.'),
-                const Text('It will be all gone like December 19 2029.'),
-                Icon(Icons.emoji_emotions, color: colorScheme.error),
               ],
             ),
           ),
