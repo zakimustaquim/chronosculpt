@@ -76,7 +76,7 @@ class DatabaseHelper {
       'comments': e.comments,
       'done': e.done,
       'quadrant': e.quadrant,
-      'doneAt': e.doneAt,
+      'doneAt': e.doneAt?.millisecondsSinceEpoch,
       'split': e.split
     };
 

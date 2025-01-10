@@ -61,7 +61,7 @@ class Entry {
     DateTime? doneAt;
     int? split;
     if (entry['doneAt'] != null) {
-      doneAt = parseString(entry['doneAt']);
+      doneAt = DateTime.fromMillisecondsSinceEpoch(entry['doneAt']);
     }
 
     if (entry['split'] != null) {

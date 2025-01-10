@@ -95,7 +95,7 @@ def init_db(reset=False):
             comments TEXT NOT NULL,
             done BOOLEAN NOT NULL DEFAULT FALSE,
             quadrant INTEGER NOT NULL,
-            doneAt TIMESTAMP,
+            doneAt BIGINT,
             split INTEGER
         )
     ''')
