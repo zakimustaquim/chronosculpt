@@ -71,14 +71,21 @@ class _CurrentDayWidgetState extends State<CurrentDayWidget> {
     //
   }
 
+  Future<void> onComplete(Entry e, bool? newStatus) async {
+    if (newStatus == null) return;
+    e.done = newStatus;
+    e = await DatabaseHelper().updateEntry(e);
+    setState(() => {});
+  }
+
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
-    var tempList = deepCopyList(widget.recordsList);
-    List<Entry> entries = tempList[0].entries;
+    List<Entry> entries = widget.recordsList[0].entries;
+    /*
     entries.removeWhere((data) =>
         !data.habitName.toLowerCase().contains(searchQuery.toLowerCase()) &&
-        !data.comments.toLowerCase().contains(searchQuery.toLowerCase()));
+        !data.comments.toLowerCase().contains(searchQuery.toLowerCase())); */
 
     return Scaffold(
       backgroundColor: colorScheme.secondary,
@@ -138,7 +145,26 @@ class _CurrentDayWidgetState extends State<CurrentDayWidget> {
                   comments: entry.comments,
                   onTap: () => onEdit(context: context, entry: entry),
                   onLongPress: () => launchStopwatchWidget(),
-                  topRightWidget: Text('d'),
+                  show: entry.habitName
+                          .toLowerCase()
+                          .contains(searchQuery.toLowerCase()) ||
+                      entry.comments
+                          .toLowerCase()
+                          .contains(searchQuery.toLowerCase()),
+                  topRightWidget: Padding(
+                    padding: const EdgeInsets.only(
+                      left: 10.0,
+                      right: 9.5,
+                    ),
+                    child: Transform.scale(
+                      scale: 1.95,
+                      child: Checkbox(
+                        shape: const CircleBorder(),
+                        value: entry.done,
+                        onChanged: (b) => onComplete(entry, b),
+                      ),
+                    ),
+                  ),
                 );
               },
             ),
