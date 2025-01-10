@@ -1,4 +1,8 @@
-class Habit {
+abstract class Cloneable {
+  Cloneable clone();
+}
+
+class Habit extends Cloneable {
   int hid;
   String uid;
   String name;
@@ -32,9 +36,22 @@ class Habit {
   @override
   String toString() =>
       '$hid | $uid | $name | $comments | $preferredQuadrant | $since | $active';
+
+  @override
+  Habit clone() {
+    return Habit(
+      active: active,
+      since: since,
+      preferredQuadrant: preferredQuadrant,
+      comments: comments,
+      name: name,
+      uid: uid,
+      hid: hid,
+    );
+  }
 }
 
-class Entry {
+class Entry extends Cloneable {
   int eid;
   int rid;
   int hid;
@@ -84,9 +101,24 @@ class Entry {
   @override
   String toString() =>
       '$eid - $rid - $hid - $habitName - $comments - $done - $quadrant - $doneAt - $split';
+
+  @override
+  Entry clone() {
+    return Entry(
+      comments: comments,
+      eid: eid,
+      rid: rid,
+      hid: hid,
+      habitName: habitName,
+      done: done,
+      doneAt: doneAt,
+      split: split,
+      quadrant: quadrant,
+    );
+  }
 }
 
-class Record {
+class Record extends Cloneable {
   int rid;
   String uid;
   DateTime date;
@@ -129,6 +161,20 @@ class Record {
   @override
   String toString() =>
       '$rid | $uid | $date | $entries | $q1notes | $q2notes | $q3notes | $q4notes';
+
+  @override
+  Record clone() {
+    return Record(
+      date: date,
+      rid: rid,
+      uid: uid,
+      q1notes: q1notes,
+      q2notes: q2notes,
+      q3notes: q3notes,
+      q4notes: q4notes,
+      entries: deepCopyList<Entry>(entries),
+    );
+  }
 }
 
 // parses a String as returned from the API into a DateTime object
@@ -190,4 +236,15 @@ class MonthNotFoundException implements Exception {
 
   @override
   String toString() => '$message: $invalidValue';
+}
+
+List<T> deepCopyList<T>(List<T> inputList) {
+  return inputList.map((element) {
+    if (element is Cloneable) {
+      return (element as Cloneable).clone() as T;
+    } else {
+      // If elements are not Cloneable, assume they are immutable (like int, String, etc.)
+      return element;
+    }
+  }).toList();
 }

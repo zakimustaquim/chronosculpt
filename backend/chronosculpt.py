@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, g, request
+from flask_cors import CORS
 from datetime import datetime, timezone, timedelta
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -11,6 +12,7 @@ load_dotenv()
 
 # Initialize Flask
 app = Flask(__name__)
+CORS(app)
 
 # Configuration
 DB_CONFIG = {
@@ -467,12 +469,6 @@ def insert_test_data():
     start_of_day_30_days_ago = datetime(date.year, date.month, date.day) + timedelta(hours=4) - timedelta(days=30)
     start_of_day_31_days_ago = datetime(date.year, date.month, date.day) + timedelta(hours=4) - timedelta(days=31)
     start_of_day_60_days_ago = datetime(date.year, date.month, date.day) + timedelta(hours=4) - timedelta(days=60)
-
-    cursor.execute('''
-        SET TIME ZONE 'UTC';
-        INSERT INTO records (uid, date)
-        VALUES ('a23', %s);
-    ''', ([start_of_day_today,]))
 
     cursor.execute('''
         SET TIME ZONE 'UTC';
