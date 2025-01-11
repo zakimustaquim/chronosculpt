@@ -50,6 +50,18 @@ class DatabaseHelper {
         await getRecordsByTimestamp(uid, date.millisecondsSinceEpoch);
     recordsList
         .removeWhere((element) => element.date.day == DateTime.now().day);
+    if (DateTime.now().hour < 4) {
+      DateTime now = DateTime.now();
+      int year = now.year;
+      int month = now.month;
+      int day = now.day;
+
+      DateTime d =
+          (DateTime(year, month, day, 4).subtract(const Duration(days: 1)));
+
+      recordsList.removeWhere((element) =>
+          element.date.day == d.day && element.date.month == d.month);
+    }
     return recordsList;
   }
 

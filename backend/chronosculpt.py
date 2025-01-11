@@ -193,7 +193,7 @@ def get_entries_by_rid(rid):
 def get_records_after_timestamp(user_id, timestamp):
     try:
         timestamp = int(timestamp) 
-        dt = datetime.fromtimestamp(timestamp / 1000.0, timezone.utc)
+        dt = datetime.fromtimestamp(timestamp / 1000.0)
 
         g.cursor.execute('''
             SELECT *
@@ -509,12 +509,22 @@ def insert_test_data():
 
     cursor.execute('''
                 INSERT INTO entries (rid, hid, comments, quadrant, done)
-                VALUES (1, 1, 1-1, 0, true);
+                VALUES (2, 1, 1-1, 0, true);
             ''')
     
     cursor.execute('''
                 INSERT INTO entries (rid, hid, comments, quadrant)
-                VALUES (1, 2, 1-1, 0);
+                VALUES (2, 2, 1-1, 0);
+            ''')
+
+    cursor.execute('''
+                INSERT INTO entries (rid, hid, comments, quadrant)
+                VALUES (2, 1, 1-1, 0);
+            ''')
+    
+    cursor.execute('''
+                INSERT INTO entries (rid, hid, comments, quadrant, done)
+                VALUES (2, 2, 1-1, 0, true);
             ''')
 
     conn.commit()

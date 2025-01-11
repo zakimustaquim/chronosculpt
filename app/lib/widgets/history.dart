@@ -179,9 +179,112 @@ class PastHabitsWidget extends StatefulWidget {
 }
 
 class _PastHabitsWidgetState extends State<PastHabitsWidget> {
+  var controller = TextEditingController();
+  var searchQuery = "";
+
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    var colorScheme = Theme.of(context).colorScheme;
+
+    // calculate habit statistics
+    Map<String, HabitRetrospective> map = {};
+    for (var record in widget.records) {
+      for (var entry in record.entries) {
+        String cleanedName = cleanName(entry.habitName);
+        if (map.containsKey(cleanedName)) {
+          map[cleanedName]!.occurrences.add(entry);
+        } else {
+          HabitRetrospective hr =
+              HabitRetrospective(name: cleanedName, occurrences: [entry]);
+          map[cleanedName] = hr;
+        }
+      }
+    }
+
+    PastHabitsWidget.past30DaysHabits =
+        map.entries.toList().map((e) => e.value).toList();
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(
+            left: 28.0,
+            right: 28.0,
+            top: 8.0,
+            bottom: 12.0,
+          ),
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              textSelectionTheme: TextSelectionThemeData(
+                selectionColor: colorScheme.surfaceContainerHighest,
+              ),
+            ),
+            child: TextField(
+              cursorColor: colorScheme.surface,
+              controller: controller,
+              decoration: InputDecoration(
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: colorScheme.surface,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: colorScheme.surfaceContainerHighest,
+                    width: 2.0,
+                  ),
+                ),
+                hintText: 'Search habits',
+                hintStyle: TextStyle(
+                  color: colorScheme.surface,
+                ),
+              ),
+              style: TextStyle(color: colorScheme.surface),
+              onSubmitted: (value) {
+                setState(() {
+                  searchQuery = value;
+                });
+              },
+              onChanged: (value) {
+                if (value == "") {
+                  setState(() {
+                    searchQuery = value;
+                  });
+                }
+              },
+            ),
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: PastHabitsWidget.past30DaysHabits.length,
+            itemBuilder: (context, index) {
+              var hr = PastHabitsWidget.past30DaysHabits[index];
+              int totalDone = 0;
+              int totalOccurrences = 0;
+              for (var occurrence in hr.occurrences) {
+                totalOccurrences++;
+                if (occurrence.done) totalDone++;
+              }
+              double donePercentage = totalOccurrences == 0
+                  ? 0
+                  : (totalDone / totalOccurrences) * 100;
+
+              return HabitCard(
+                textColor: colorScheme.secondary,
+                backgroundColor: colorScheme.surface,
+                title: hr.name,
+                comments: '$totalDone out of $totalOccurrences done',
+                onTap: () {},
+                topRightWidget: DonePercentage(
+                  val: donePercentage.toStringAsFixed(0),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
   }
 }
 
