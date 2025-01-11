@@ -112,7 +112,7 @@ def get_habits_by_user_id(user_id):
         g.cursor.execute('''
             SELECT *
             FROM habits
-            WHERE uid = %s
+            WHERE uid = %s AND active = true
         ''', (user_id,))
 
         habits = g.cursor.fetchall()
@@ -417,7 +417,8 @@ def update_habit(habit_id):
 def delete_habit(habit_id):
     try:
         g.cursor.execute('''
-            DELETE FROM habits 
+            UPDATE habits
+            SET active = false
             WHERE hid = %s
             returning hid;
         ''', [habit_id])
@@ -505,6 +506,16 @@ def insert_test_data():
         INSERT INTO records (uid, date)
         VALUES ('a23', %s);
     ''', ([start_of_day_60_days_ago]))
+
+    cursor.execute('''
+                INSERT INTO entries (rid, hid, comments, quadrant, done)
+                VALUES (1, 1, 1-1, 0, true);
+            ''')
+    
+    cursor.execute('''
+                INSERT INTO entries (rid, hid, comments, quadrant)
+                VALUES (1, 2, 1-1, 0);
+            ''')
 
     conn.commit()
     cursor.close()

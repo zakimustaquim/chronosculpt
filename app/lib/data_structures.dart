@@ -298,3 +298,94 @@ class HabitRetrospective {
   @override
   String toString() => "$name $occurrences";
 }
+
+int getLengthOfHabit(String s) {
+  if (s.isEmpty) return 0;
+  List<String> split = s.split('(');
+  int guess = 0;
+
+  for (String str in split) {
+    int parsed = parseProbableString(str);
+    if (parsed > 0) guess = parsed;
+  }
+
+  return guess;
+}
+
+// looks for the first number in s, returns 0 if there are none
+int parseProbableString(String s) {
+  List<String> tokens = s.split(' ');
+  for (String str in tokens) {
+    String removed = removeRightParenthesis(str);
+    int? parsed = int.tryParse(removeRightParenthesis(str));
+    if (parsed == null) {
+      if (removed != str) {
+        return 0;
+      } else {
+        continue;
+      }
+    } else {
+      return parsed;
+    }
+  }
+  return 0;
+}
+
+String removeRightParenthesis(String s) {
+  if (s.contains(')')) {
+    var chars = s.split('');
+    StringBuffer newString = StringBuffer();
+    for (int i = 0; i < chars.length; i++) {
+      if (chars[i] != ')') newString.write(chars[i]);
+    }
+    return newString.toString();
+  } else {
+    return s;
+  }
+}
+
+// removes anything in parentheses and trimes
+String cleanName(String name) {
+  StringBuffer sb = StringBuffer();
+  bool writing = true;
+  for (var char in name.split('')) {
+    if (char == '(') {
+      writing = false;
+    } else if (char == ')') {
+      writing = true;
+    } else if (writing) {
+      sb.write(char);
+    }
+  }
+  return sb.toString().trim();
+}
+
+int getTimesink(List<Entry> entries) {
+  int res = 0;
+  for (var entry in entries) {
+    res += getLengthOfHabit(entry.habitName);
+  }
+  return res;
+}
+
+String formatSplit(double milliseconds) {
+  Duration d = Duration(milliseconds: milliseconds.round());
+  String noMilliseconds = d.toString().split('.')[0];
+  if (d.inHours >= 1) {
+    return noMilliseconds;
+  } else {
+    return noMilliseconds.substring(2);
+  }
+}
+
+String formatDateForPastRecord(DateTime date) {
+  bool isPm = (date.hour >= 12);
+  if (isPm && date.hour > 12) date = date.subtract(const Duration(hours: 12));
+  if (date.hour == 0) date = date.add(const Duration(hours: 12));
+  String mainString = date.toString().split(' ')[1].split('.')[0];
+  if (isPm) {
+    return "$mainString PM";
+  } else {
+    return "$mainString AM";
+  }
+}
