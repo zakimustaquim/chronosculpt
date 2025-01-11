@@ -231,8 +231,10 @@ class MonthNotFoundException implements Exception {
   final String message;
   final String invalidValue;
 
-  MonthNotFoundException(
-      {this.invalidValue = '', this.message = 'Month could not be parsed'});
+  MonthNotFoundException({
+    this.invalidValue = '',
+    this.message = 'Month could not be parsed',
+  });
 
   @override
   String toString() => '$message: $invalidValue';
@@ -247,4 +249,52 @@ List<T> deepCopyList<T>(List<T> inputList) {
       return element;
     }
   }).toList();
+}
+
+class HabitRetrospective {
+  final String name;
+  final List<Entry> occurrences;
+
+  HabitRetrospective({
+    required this.name,
+    required this.occurrences,
+  });
+
+  double get averageSplit {
+    int totalTime = 0;
+    int totalRecordedSplits = 0;
+
+    for (var occurrence in occurrences) {
+      if (occurrence.split != null) {
+        totalTime += occurrence.split!;
+        totalRecordedSplits++;
+      }
+    }
+
+    if (totalRecordedSplits == 0) return 0;
+
+    double average = totalTime / totalRecordedSplits;
+    return average;
+  }
+
+  int get minSplit {
+    int min = 9007199254740;
+    for (var occurrence in occurrences) {
+      if (occurrence.split != null && occurrence.split! < min) {
+        min = occurrence.split!;
+      }
+    }
+    return min;
+  }
+
+  double get donePercentage {
+    int totalDone = 0;
+    for (var occurrence in occurrences) {
+      if (occurrence.done) totalDone++;
+    }
+    return totalDone / occurrences.length;
+  }
+
+  @override
+  String toString() => "$name $occurrences";
 }

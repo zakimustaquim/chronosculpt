@@ -29,7 +29,11 @@ class _LogWidgetState extends State<LogWidget> {
           return SnapshotErrorScreen(snapshot: snapshot);
         }
 
-        if (snapshot.data != null && snapshot.data!.isNotEmpty) {
+        if (snapshot.data == null) {
+          return ErrorScreen(message: 'The data was unexpectedly null.');
+        }
+
+        if (snapshot.data!.isNotEmpty) {
           return CurrentDayWidget(
             recordsList: snapshot.data!,
           );
