@@ -191,6 +191,7 @@ class _PastHabitsWidgetState extends State<PastHabitsWidget> {
     for (var record in widget.records) {
       for (var entry in record.entries) {
         String cleanedName = cleanName(entry.habitName);
+        entry.dateOfOccurrence = record.date;
         if (map.containsKey(cleanedName)) {
           map[cleanedName]!.occurrences.add(entry);
         } else {
@@ -275,7 +276,14 @@ class _PastHabitsWidgetState extends State<PastHabitsWidget> {
                 backgroundColor: colorScheme.surface,
                 title: hr.name,
                 comments: '$totalDone out of $totalOccurrences done',
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PastHabitDisplayWidget(hr: hr),
+                    ),
+                  );
+                },
                 topRightWidget: DonePercentage(
                   val: donePercentage.toStringAsFixed(0),
                 ),
@@ -424,7 +432,8 @@ class _PastRecordDisplayWidgetState extends State<PastRecordDisplayWidget> {
 }
 
 class PastHabitDisplayWidget extends StatefulWidget {
-  const PastHabitDisplayWidget({super.key});
+  final HabitRetrospective hr;
+  const PastHabitDisplayWidget({super.key, required this.hr});
 
   @override
   State<PastHabitDisplayWidget> createState() => _PastHabitDisplayWidgetState();
@@ -433,6 +442,76 @@ class PastHabitDisplayWidget extends StatefulWidget {
 class _PastHabitDisplayWidgetState extends State<PastHabitDisplayWidget> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    var colorScheme = Theme.of(context).colorScheme;
+    String infoString = widget.hr.name;
+    if (widget.hr.averageSplit > 0) {
+      infoString =
+          "$infoString\nAverage Split: ${formatSplit(widget.hr.averageSplit)}";
+    }
+
+    return Scaffold(
+      backgroundColor: colorScheme.secondary,
+      body: Column(
+        children: [
+          Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 28.0, left: 20.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Icon(Icons.arrow_back_ios_new_outlined),
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 12.0, bottom: 8.0),
+            child: Text(
+              infoString,
+              style: TextStyle(fontSize: 18.0, color: colorScheme.surface),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: widget.hr.occurrences.length,
+              itemBuilder: (context, index) {
+                final occurrence = widget.hr.occurrences[index];
+                String dateString =
+                    occurrence.dateOfOccurrence.toString().split(' ')[0];
+                if (occurrence.split != null) {
+                  dateString =
+                      "$dateString - ${formatSplit(occurrence.split! * 1.0)}";
+                }
+
+                return HabitCard(
+                  textColor: colorScheme.secondary,
+                  backgroundColor: colorScheme.surface,
+                  title: dateString,
+                  comments: occurrence.comments,
+                  onTap: () {},
+                  topRightWidget: Padding(
+                    padding: const EdgeInsets.only(
+                      left: 10.0,
+                      right: 9.5,
+                    ),
+                    child: Transform.scale(
+                      scale: 1.95,
+                      child: Checkbox(
+                        shape: const CircleBorder(),
+                        value: occurrence.done,
+                        onChanged: (b) => {},
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

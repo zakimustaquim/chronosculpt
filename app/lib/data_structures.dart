@@ -61,6 +61,7 @@ class Entry extends Cloneable {
   int quadrant;
   DateTime? doneAt;
   int? split;
+  DateTime? dateOfOccurrence;
 
   Entry({
     required this.eid,
@@ -72,6 +73,7 @@ class Entry extends Cloneable {
     required this.quadrant,
     this.doneAt,
     this.split,
+    this.dateOfOccurrence,
   });
 
   factory Entry.fromMap(Map<String, dynamic> entry) {
