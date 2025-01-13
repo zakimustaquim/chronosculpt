@@ -174,21 +174,10 @@ class PastHabitsWidget extends StatefulWidget {
   final List<Record> records;
   const PastHabitsWidget({super.key, required this.records});
 
-  @override
-  State<PastHabitsWidget> createState() => _PastHabitsWidgetState();
-}
-
-class _PastHabitsWidgetState extends State<PastHabitsWidget> {
-  var controller = TextEditingController();
-  var searchQuery = "";
-
-  @override
-  Widget build(BuildContext context) {
-    var colorScheme = Theme.of(context).colorScheme;
-
+  static void analyzeData(List<Record> data) {
     // calculate habit statistics
     Map<String, HabitRetrospective> map = {};
-    for (var record in widget.records) {
+    for (var record in data) {
       for (var entry in record.entries) {
         String cleanedName = cleanName(entry.habitName);
         entry.dateOfOccurrence = record.date;
@@ -204,6 +193,26 @@ class _PastHabitsWidgetState extends State<PastHabitsWidget> {
 
     PastHabitsWidget.past30DaysHabits =
         map.entries.toList().map((e) => e.value).toList();
+  }
+
+  static Future<void> retrieveAndAnalyzeData() async {
+    var data = await DatabaseHelper().getPast30Days(getCurrentUserUid());
+    analyzeData(data);
+  }
+
+  @override
+  State<PastHabitsWidget> createState() => _PastHabitsWidgetState();
+}
+
+class _PastHabitsWidgetState extends State<PastHabitsWidget> {
+  var controller = TextEditingController();
+  var searchQuery = "";
+
+  @override
+  Widget build(BuildContext context) {
+    var colorScheme = Theme.of(context).colorScheme;
+
+    PastHabitsWidget.analyzeData(widget.records);
 
     return Column(
       children: [

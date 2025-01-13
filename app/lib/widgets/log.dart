@@ -57,8 +57,8 @@ class NoRecordFoundWidget extends StatelessWidget {
       refresher();
     } on DatabaseTransactionException catch (dte) {
       if (dte.errorCode == 406) {
-          Dialogs.showAlertDialog(context,
-              'Please add at least one habit before creating a daily record.');
+        Dialogs.showAlertDialog(context,
+            'Please add at least one habit before creating a daily record.');
       } else {
         showSnackBar(context, dte.toString());
       }
@@ -205,7 +205,14 @@ class _CurrentDayWidgetState extends State<CurrentDayWidget> {
                   title: entry.habitName,
                   comments: entry.comments,
                   onTap: () => onEdit(context: context, entry: entry),
-                  onLongPress: () => launchStopwatchWidget(),
+                  onLongPress: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => StopwatchWidget(entry: entry),
+                      ),
+                    );
+                  },
                   show: entry.habitName
                           .toLowerCase()
                           .contains(searchQuery.toLowerCase()) ||

@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 // global variables
 bool authenticated = false;
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   attemptSignIn();
   runApp(const ChronosculptApp());
@@ -77,6 +77,10 @@ class _MainWidgetState extends State<MainWidget> {
         page = const Placeholder();
         break;
     }
+
+    PastHabitsWidget.retrieveAndAnalyzeData().catchError(
+      (error) => showSnackBar(context, 'Error preloading past data: $error'),
+    );
 
     applicationContext ??= context;
     return Scaffold(

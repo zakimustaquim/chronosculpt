@@ -276,7 +276,7 @@ class _QuadrantContainerState extends State<QuadrantContainer> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => StopwatchWidget(),
+              builder: (context) => StopwatchWidget(entry: entry),
             ),
           );
         },
