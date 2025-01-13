@@ -14,4 +14,4 @@ jobs:
       - uses: bluefireteam/flutter-gh-pages@v7
         with:
           target-branch: gh-pages
-          workingDir: '/app'
+          workingDir: './app/'
