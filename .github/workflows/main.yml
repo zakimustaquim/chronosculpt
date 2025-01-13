@@ -12,3 +12,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
       - uses: bluefireteam/flutter-gh-pages@v7
+        with:
+          target-branch: gh-pages
+          workingDir: '/app'
