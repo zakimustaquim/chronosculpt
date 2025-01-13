@@ -509,17 +509,17 @@ def insert_test_data():
 
     cursor.execute('''
                 INSERT INTO entries (rid, hid, comments, quadrant, done)
-                VALUES (3, 1, 1-1, 0, true);
+                VALUES (1, 1, 1-1, 0, true);
             ''')
     
     cursor.execute('''
                 INSERT INTO entries (rid, hid, comments, quadrant)
-                VALUES (3, 2, 1-1, 0);
+                VALUES (1, 2, 1-1, 0);
             ''')
 
     cursor.execute('''
-                INSERT INTO entries (rid, hid, comments, quadrant, split)
-                VALUES (2, 1, 1-1, 0, 34000);
+                INSERT INTO entries (rid, hid, comments, quadrant, split, doneAt)
+                VALUES (2, 1, 1-1, 0, 34000, 1736788152692);
             ''')
     
     cursor.execute('''

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chronosculpt/data_structures.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -162,9 +163,10 @@ class Dialogs {
   }
 
   /// Shows a dialog displaying a given message to the user.
-  static Future<void> showAlertDialog(BuildContext context, String message) async {
+  static Future<void> showAlertDialog(
+      BuildContext context, String message) async {
     if (!context.mounted) return;
-    
+
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -183,6 +185,92 @@ class Dialogs {
               child: const Text('Dismiss'),
               onPressed: () {
                 Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  static Future<String?> showSchedulingDialog({
+    required BuildContext context,
+    String? title,
+    required List<Entry> entries,
+    required String initialValue,
+    required int? quadrant,
+  }) async {
+    final TextEditingController textController =
+        TextEditingController(text: initialValue);
+
+    List<Widget> habitWidgets = entries
+        .map(
+          (e) => Text(e.habitName),
+        )
+        .toList();
+    Widget habitInfo = Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.8,
+        child: Wrap(
+          direction: Axis.horizontal,
+          spacing: 18.0,
+          runSpacing: 2.0,
+          children: habitWidgets,
+        ),
+      ),
+    );
+
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(
+            title ?? 'Enter Information',
+            style: const TextStyle(fontSize: 18),
+          ),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Notes for Quadrant $quadrant',
+                style: const TextStyle(fontSize: 16),
+              ),
+              (kIsWeb ? habitInfo : const SizedBox()),
+              const SizedBox(
+                height: 16.0,
+              ),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.8,
+                height: MediaQuery.of(context).size.height * 0.25,
+                child: TextField(
+                  textCapitalization: TextCapitalization.sentences,
+                  style: const TextStyle(fontSize: 12),
+                  controller: textController,
+                  decoration: const InputDecoration(
+                    hintText: 'Type here...',
+                    border: OutlineInputBorder(),
+                  ),
+                  autofocus: true,
+                  maxLines: null,
+                  expands: true,
+                  textAlignVertical: TextAlignVertical.top,
+                  keyboardType: TextInputType.multiline,
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Confirm'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(textController.text);
               },
             ),
           ],

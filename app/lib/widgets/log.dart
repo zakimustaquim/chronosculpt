@@ -138,6 +138,7 @@ class _CurrentDayWidgetState extends State<CurrentDayWidget> {
   Future<void> onComplete(Entry e, bool? newStatus) async {
     if (newStatus == null) return;
     e.done = newStatus;
+    e.doneAt = newStatus == true ? DateTime.now() : null;
     await DatabaseHelper().updateEntry(e);
     setState(() => {});
   }
