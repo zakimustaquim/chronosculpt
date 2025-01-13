@@ -324,9 +324,13 @@ class _QuadrantContainerState extends State<QuadrantContainer> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => LiveSplitter(),
+                    builder: (context) => LiveSplitter(
+                      entries: widget.entries,
+                    ),
                   ),
-                );
+                ).then((_) {
+                  widget.refresher();
+                });
               },
         onHighlightChanged: (h) => setState(() {
           scale = h ? 0.92 : 1;

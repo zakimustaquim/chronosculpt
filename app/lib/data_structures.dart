@@ -301,6 +301,26 @@ class HabitRetrospective {
   String toString() => "$name $occurrences";
 }
 
+enum LiveSplitStatus { waiting, inProgress, uploading, uploadSuccess, uploadFailure }
+
+class LiveSplitUnit {
+  Entry entry;
+  DateTime? startTime;
+  Duration elapsed;
+  double averageSplit;
+  int minSplit;
+  LiveSplitStatus status;
+
+  LiveSplitUnit({
+    required this.entry,
+    this.startTime,
+    this.elapsed = Duration.zero,
+    required this.averageSplit,
+    required this.minSplit,
+    this.status = LiveSplitStatus.waiting,
+  });
+}
+
 int getLengthOfHabit(String s) {
   if (s.isEmpty) return 0;
   List<String> split = s.split('(');
@@ -390,4 +410,18 @@ String formatDateForPastRecord(DateTime date) {
   } else {
     return "$mainString AM";
   }
+}
+
+double getAverageSplit(Entry e, List<HabitRetrospective> hrs) {
+  for (var hr in hrs) {
+    if (hr.name == e.habitName) return hr.averageSplit;
+  }
+  return -1;
+}
+
+int getMinSplit(Entry e, List<HabitRetrospective> hrs) {
+  for (var hr in hrs) {
+    if (hr.name == e.habitName) return hr.minSplit;
+  }
+  return -1;
 }
