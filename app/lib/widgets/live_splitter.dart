@@ -9,8 +9,7 @@ import 'package:flutter/material.dart';
 
 class LiveSplitter extends StatefulWidget {
   final List<Entry> entries;
-  const LiveSplitter(
-      {super.key, required this.entries});
+  const LiveSplitter({super.key, required this.entries});
 
   @override
   State<LiveSplitter> createState() => _LiveSplitterState();
@@ -413,8 +412,9 @@ class _LiveSplitTileState extends State<LiveSplitTile> {
         );
       case LiveSplitStatus.uploading:
         return Transform.scale(
-            scale: 0.5,
-            child: CircularProgressIndicator(color: scheme.secondary));
+          scale: 0.5,
+          child: CircularProgressIndicator(color: scheme.secondary),
+        );
       case LiveSplitStatus.uploadSuccess:
         return Icon(Icons.check, color: scheme.secondary);
       case LiveSplitStatus.uploadFailure:
