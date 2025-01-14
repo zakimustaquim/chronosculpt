@@ -1,3 +1,4 @@
+import 'package:chronosculpt/firebase_helper.dart';
 import 'package:chronosculpt/firebase_options.dart';
 import 'package:chronosculpt/widgets/authentication.dart';
 import 'package:chronosculpt/widgets/habit_list.dart';
@@ -5,28 +6,31 @@ import 'package:chronosculpt/widgets/history.dart';
 import 'package:chronosculpt/widgets/interactive_scheduler.dart';
 import 'package:chronosculpt/widgets/log.dart';
 import 'package:chronosculpt/widgets/misc_widgets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 // global variables
-bool authenticated = false;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  attemptSignIn();
+  recoverAuthenticationState();
   runApp(const ChronosculptApp());
 }
 
-void attemptSignIn() {
-  // will do when authentication implemented
-  // retrieve saved login and attempt to sign in
+void recoverAuthenticationState() {
+  if (FirebaseAuth.instance.currentUser != null) {
+    // TODO - handle "remember me"
+    // authenticated = true;
+  }
 }
 
 String getCurrentUserUid() {
-  return 'a23';
+  var currentUser = FirebaseAuth.instance.currentUser;
+  return currentUser?.uid ?? 'none';
 }
 
 void showSnackBar(BuildContext context, String s) {
@@ -67,7 +71,7 @@ class _MainWidgetState extends State<MainWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (!authenticated) {
+    if (FirebaseHelper().authenticated()) {
       return const AuthenticationWidget();
     }
 
@@ -107,7 +111,11 @@ class _MainWidgetState extends State<MainWidget> {
       appBar: AppBar(
         title: Text(appBarText),
         actions: [
-          ElevatedButton(onPressed: () {}, child: Text('Sign Out')),
+          ElevatedButton(onPressed: () async {
+            // TODO - fix once login implemented
+            await FirebaseHelper().signOut();
+            setState(() {});
+          }, child: Text('Sign Out')),
         ],
       ),
       body: Column(

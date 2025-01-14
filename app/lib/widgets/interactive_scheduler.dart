@@ -3,6 +3,7 @@ import 'package:chronosculpt/database_helper.dart';
 import 'package:chronosculpt/main.dart';
 import 'package:chronosculpt/widgets/dialogs.dart';
 import 'package:chronosculpt/widgets/live_splitter.dart';
+import 'package:chronosculpt/widgets/log.dart';
 import 'package:chronosculpt/widgets/misc_widgets.dart';
 import 'package:chronosculpt/widgets/stopwatch.dart';
 import 'package:flutter/material.dart';
@@ -54,8 +55,9 @@ class _InteractiveSchedulerWidgetState
               }
 
               if (snapshot.data!.isEmpty) {
-                return ErrorScreen(
-                    message: 'Error: no record found, please create one');
+                return NoRecordFoundWidget(refresher: () {
+                  setState(() {});
+                });
               }
 
               List<List<Entry>> stratifiedList = [

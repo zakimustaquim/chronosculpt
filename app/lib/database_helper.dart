@@ -13,7 +13,7 @@ class DatabaseHelper {
   DatabaseHelper();
 
   Future<List<Habit>> getHabits(String uid) async {
-    final response = await http.get(Uri.parse('$backendPath/habits/a23/'));
+    final response = await http.get(Uri.parse('$backendPath/habits/$uid/'));
     checkResponse(response);
     final Map<String, dynamic> data = json.decode(response.body);
 

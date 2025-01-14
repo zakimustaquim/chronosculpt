@@ -416,12 +416,12 @@ double getAverageSplit(Entry e, List<HabitRetrospective> hrs) {
   for (var hr in hrs) {
     if (hr.name == e.habitName) return hr.averageSplit;
   }
-  return -1;
+  return 0;
 }
 
 int getMinSplit(Entry e, List<HabitRetrospective> hrs) {
   for (var hr in hrs) {
     if (hr.name == e.habitName) return hr.minSplit;
   }
-  return -1;
+  return 9007199254740;
 }
