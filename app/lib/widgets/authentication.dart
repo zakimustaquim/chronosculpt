@@ -127,11 +127,15 @@ class ChronosculptTextField extends StatefulWidget {
   final TextEditingController controller;
   final String hintText;
   final bool? obscure;
-  const ChronosculptTextField(
-      {super.key,
-      required this.controller,
-      required this.hintText,
-      this.obscure});
+  final Function(String)? onSubmit;
+
+  const ChronosculptTextField({
+    super.key,
+    required this.controller,
+    required this.hintText,
+    this.obscure,
+    this.onSubmit,
+  });
 
   @override
   State<ChronosculptTextField> createState() => ChronosculptTextFieldState();
@@ -148,6 +152,7 @@ class ChronosculptTextFieldState extends State<ChronosculptTextField> {
         ),
       ),
       child: TextField(
+        onSubmitted: widget.onSubmit,
         obscureText: widget.obscure == null ? false : true,
         cursorColor: colorScheme.surface,
         controller: widget.controller,
@@ -231,18 +236,21 @@ class _SignupScreenState extends State<SignupScreen> {
               ChronosculptTextField(
                 controller: emailController,
                 hintText: 'Email',
+                onSubmit: (_) => signUp(context),
               ),
               SizedBox(height: 12.0),
               ChronosculptTextField(
                 controller: passController,
                 hintText: 'Password',
                 obscure: true,
+                onSubmit: (_) => signUp(context),
               ),
               SizedBox(height: 12.0),
               ChronosculptTextField(
                 controller: confPassController,
                 hintText: 'Confirm Password',
                 obscure: true,
+                onSubmit: (_) => signUp(context),
               ),
               SizedBox(height: 12.0),
               Row(
@@ -291,8 +299,93 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  var rememberMe = false;
+  var emailController = TextEditingController();
+  var passController = TextEditingController();
+
+  Future<void> logIn(BuildContext context) async {
+    await FirebaseHelper()
+        .logIn(emailController.text, passController.text, context);
+
+    if (getCurrentUserUid() != 'none') {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => MainWidget()),
+        (Route<dynamic> route) => false, // Removes all previous routes
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    var colorScheme = Theme.of(context).colorScheme;
+
+    return Scaffold(
+      backgroundColor: colorScheme.secondary,
+      body: Center(
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: 240,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Log In',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.surface,
+                  fontSize: 24.0,
+                ),
+              ),
+              SizedBox(height: 16.0),
+              ChronosculptTextField(
+                controller: emailController,
+                hintText: 'Email',
+                onSubmit: (_) => logIn(context),
+              ),
+              SizedBox(height: 12.0),
+              ChronosculptTextField(
+                controller: passController,
+                hintText: 'Password',
+                obscure: true,
+                onSubmit: (_) => logIn(context),
+              ),
+              SizedBox(height: 12.0),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Remember me?',
+                      style: TextStyle(color: colorScheme.surface),
+                    ),
+                  ),
+                  Checkbox(
+                    fillColor: WidgetStateProperty.resolveWith((_) {
+                      return colorScheme.secondaryContainer;
+                    }),
+                    checkColor: Colors.black,
+                    value: rememberMe,
+                    onChanged: (b) => setState(
+                      () {
+                        rememberMe = b ?? false;
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16.0),
+              ElevatedButton(
+                onPressed: () => logIn(context),
+                child: Text(
+                  'Submit',
+                  style: TextStyle(color: colorScheme.secondary),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
