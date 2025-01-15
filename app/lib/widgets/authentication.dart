@@ -21,6 +21,7 @@ class _AuthenticationWidgetState extends State<AuthenticationWidget> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             LogoDisplay(),
+            SizedBox(height: 72.0),
             LoginSignupButtons(),
           ],
         ),
@@ -40,7 +41,8 @@ class _LogoDisplayState extends State<LogoDisplay> {
   bool _visible = false;
   @override
   Widget build(BuildContext context) {
-    Future.delayed(Duration(milliseconds: 1000), () {
+    var colorScheme = Theme.of(context).colorScheme;
+    Future.delayed(Duration(milliseconds: 500), () {
       if (mounted) {
         setState(() {
           _visible = true;
@@ -50,8 +52,20 @@ class _LogoDisplayState extends State<LogoDisplay> {
 
     return AnimatedOpacity(
       opacity: _visible ? 1.0 : 0.0,
-      duration: Duration(milliseconds: 1000),
-      child: Image.asset('images/logo.png', scale: 5),
+      duration: Duration(milliseconds: 2000),
+      curve: Curves.easeIn,
+      child: Column(
+        children: [
+          Image.asset('images/logo.png', scale: 5),
+          Text(
+            'Chronosculpt',
+            style: TextStyle(
+              fontSize: 36.0,
+              color: colorScheme.surface,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -98,7 +112,8 @@ class _LoginSignupButtonsState extends State<LoginSignupButtons> {
 
     return AnimatedOpacity(
       opacity: _visible ? 1.0 : 0.0,
-      duration: Duration(milliseconds: 250),
+      duration: Duration(milliseconds: 1000),
+      curve: Curves.easeIn,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

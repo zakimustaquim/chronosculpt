@@ -112,7 +112,6 @@ class _MainWidgetState extends State<MainWidget> {
         title: Text(appBarText),
         actions: [
           ElevatedButton(onPressed: () async {
-            // TODO - fix once login implemented
             await FirebaseHelper().signOut();
             setState(() {});
           }, child: Text('Sign Out')),
