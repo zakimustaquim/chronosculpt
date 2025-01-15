@@ -28,7 +28,7 @@ connection_string = os.getenv('NEON_STRING')
 # Create connection pool
 db_pool = SimpleConnectionPool(
     1,
-    20,
+    10,
     connection_string,
 )
 
@@ -430,15 +430,6 @@ def delete_habit(habit_id):
         return jsonify({'deleted_id': hid}), 200
     except TypeError as te:
         return jsonify({'error': 'No habits were found matching the criteria'}), 404
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/', methods=['POST'])
-def test():
-    try:
-        data = request.get_json()
-        print(data.get('test'))
-        return jsonify({'message': 'success'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
