@@ -1,5 +1,6 @@
 import 'package:chronosculpt/firebase_helper.dart';
 import 'package:chronosculpt/firebase_options.dart';
+import 'package:chronosculpt/shared_preferences_helper.dart';
 import 'package:chronosculpt/widgets/authentication.dart';
 import 'package:chronosculpt/widgets/habit_list.dart';
 import 'package:chronosculpt/widgets/history.dart';
@@ -17,15 +18,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  recoverAuthenticationState();
+  await SharedPreferencesHelper().forgetIfRequested();
   runApp(const ChronosculptApp());
-}
-
-void recoverAuthenticationState() {
-  if (FirebaseAuth.instance.currentUser != null) {
-    // TODO - handle "remember me"
-    // authenticated = true;
-  }
 }
 
 String getCurrentUserUid() {
@@ -111,10 +105,12 @@ class _MainWidgetState extends State<MainWidget> {
       appBar: AppBar(
         title: Text(appBarText),
         actions: [
-          ElevatedButton(onPressed: () async {
-            await FirebaseHelper().signOut();
-            setState(() {});
-          }, child: Text('Sign Out')),
+          ElevatedButton(
+              onPressed: () async {
+                await FirebaseHelper().signOut();
+                setState(() {});
+              },
+              child: Text('Sign Out')),
         ],
       ),
       body: Column(

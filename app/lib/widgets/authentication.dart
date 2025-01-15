@@ -1,4 +1,5 @@
 import 'package:chronosculpt/main.dart';
+import 'package:chronosculpt/shared_preferences_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:chronosculpt/firebase_helper.dart';
 
@@ -217,6 +218,7 @@ class _SignupScreenState extends State<SignupScreen> {
         .createUser(emailController.text, passController.text, context);
 
     if (getCurrentUserUid() != 'none') {
+      if (!rememberMe) SharedPreferencesHelper().setToForget();
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => MainWidget()),
@@ -323,6 +325,7 @@ class _LoginScreenState extends State<LoginScreen> {
         .logIn(emailController.text, passController.text, context);
 
     if (getCurrentUserUid() != 'none') {
+      if (!rememberMe) SharedPreferencesHelper().setToForget();
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => MainWidget()),
