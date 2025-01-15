@@ -48,6 +48,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
     if (_isRunning) {
       toggleText = "Start";
       _timer.cancel();
+      _elapsed = DateTime.now().difference(_startTime!);
       _startTime = null;
       setState(() {
         _isRunning = false;
@@ -94,6 +95,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
     setState(() {
       _enableButton = false;
     });
+    _start();
     var tempStartTime = _startTime;
     _stop();
     _elapsed = DateTime.now().difference(tempStartTime!);
@@ -116,12 +118,17 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
       newSplit = _elapsed.inMilliseconds;
     }
 
+    widget.entry.done = true;
+    widget.entry.doneAt = DateTime.now();
     widget.entry.split = newSplit;
     try {
       await DatabaseHelper().updateEntry(widget.entry);
       if (context.mounted) Navigator.of(context).pop();
     } catch (e) {
       showSnackBar(context, 'Error updating entry: $e');
+      setState(() {
+        _enableButton = true;
+      });
     }
   }
 

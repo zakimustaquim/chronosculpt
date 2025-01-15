@@ -58,7 +58,12 @@ class _InteractiveSchedulerWrapperState
                 });
               }
 
-              return InteractiveSchedulerWidget(r: snapshot.data![0]);
+              return InteractiveSchedulerWidget(
+                r: snapshot.data![0],
+                reloader: () {
+                  setState(() {});
+                },
+              );
             },
           )),
         ],
@@ -69,7 +74,12 @@ class _InteractiveSchedulerWrapperState
 
 class InteractiveSchedulerWidget extends StatefulWidget {
   final Record r;
-  const InteractiveSchedulerWidget({super.key, required this.r});
+  final Function reloader;
+  const InteractiveSchedulerWidget({
+    super.key,
+    required this.r,
+    required this.reloader,
+  });
 
   @override
   State<InteractiveSchedulerWidget> createState() =>
@@ -125,6 +135,7 @@ class _InteractiveSchedulerWidgetState
                   scrollController: scrollController,
                   record: widget.r,
                   refresher: () => stateSetter(),
+                  reloader: () => widget.reloader(),
                 ),
               ),
             ],
@@ -141,6 +152,7 @@ class _InteractiveSchedulerWidgetState
                     scrollController: scrollController,
                     record: widget.r,
                     refresher: () => stateSetter(),
+                    reloader: () => widget.reloader(),
                   ),
                 ),
                 Expanded(
@@ -150,6 +162,7 @@ class _InteractiveSchedulerWidgetState
                     scrollController: scrollController,
                     record: widget.r,
                     refresher: () => stateSetter(),
+                    reloader: () => widget.reloader(),
                   ),
                 ),
               ],
@@ -167,6 +180,7 @@ class _InteractiveSchedulerWidgetState
                     scrollController: scrollController,
                     record: widget.r,
                     refresher: () => stateSetter(),
+                    reloader: () => widget.reloader(),
                   ),
                 ),
                 Expanded(
@@ -176,6 +190,7 @@ class _InteractiveSchedulerWidgetState
                     scrollController: scrollController,
                     record: widget.r,
                     refresher: () => stateSetter(),
+                    reloader: () => widget.reloader(),
                   ),
                 ),
               ],
@@ -192,6 +207,7 @@ class _InteractiveSchedulerWidgetState
                   donePercentage: donePercentage,
                   record: widget.r,
                   refresher: () => stateSetter(),
+                  reloader: () => widget.reloader(),
                 ),
               ),
             ],
@@ -209,6 +225,7 @@ class QuadrantContainer extends StatefulWidget {
   final double donePercentage;
   final Record record;
   final Function refresher;
+  final Function reloader;
 
   const QuadrantContainer({
     super.key,
@@ -217,6 +234,7 @@ class QuadrantContainer extends StatefulWidget {
     required this.scrollController,
     required this.record,
     required this.refresher,
+    required this.reloader,
     this.donePercentage = 0,
   });
 
@@ -290,18 +308,25 @@ class _QuadrantContainerState extends State<QuadrantContainer> {
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
         onTap: () async {
-          entry.done = widget.quadrant < 5 ? true : false;
-          entry.doneAt = widget.quadrant < 5 ? DateTime.now() : null;
-          await DatabaseHelper().updateEntry(entry);
-          widget.refresher();
+          var temp = entry.clone();
+          temp.done = widget.quadrant < 5 ? true : false;
+          temp.doneAt = widget.quadrant < 5 ? DateTime.now() : null;
+          try {
+            await DatabaseHelper().updateEntry(temp);
+            entry.updateFrom(temp);
+            widget.refresher();
+          } catch (e) {
+            showSnackBar(context, 'Error updating entry: $e');
+          }
         },
         onLongPress: () {
           Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => StopwatchWidget(entry: entry),
-            ),
-          );
+              context,
+              MaterialPageRoute(
+                builder: (context) => StopwatchWidget(entry: entry),
+              )).then((_) {
+            widget.refresher();
+          });
         },
         child: Draggable<Entry>(
           onDragUpdate: (details) {
@@ -352,7 +377,7 @@ class _QuadrantContainerState extends State<QuadrantContainer> {
                     ),
                   ),
                 ).then((_) {
-                  widget.refresher();
+                  widget.reloader();
                 });
               },
         onHighlightChanged: (h) => setState(() {
@@ -411,16 +436,18 @@ class _QuadrantContainerState extends State<QuadrantContainer> {
           },
           onAcceptWithDetails: (details) async {
             Entry entry = details.data;
+            Entry temp = entry.clone();
             if (widget.quadrant != 5) {
-              entry.done = false;
-              entry.doneAt = null;
-              entry.quadrant = widget.quadrant;
+              temp.done = false;
+              temp.doneAt = null;
+              temp.quadrant = widget.quadrant;
             } else {
-              entry.done = true;
-              entry.doneAt = DateTime.now();
+              temp.done = true;
+              temp.doneAt = DateTime.now();
             }
             try {
-              await DatabaseHelper().updateEntry(entry);
+              await DatabaseHelper().updateEntry(temp);
+              entry.updateFrom(temp);
               widget.refresher();
             } catch (e) {
               showSnackBar(context, 'Error updating entry: $e');

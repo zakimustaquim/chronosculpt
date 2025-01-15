@@ -125,9 +125,11 @@ class _CurrentDayWidgetState extends State<CurrentDayWidget> {
     );
 
     if (userInput != null) {
-      entry.comments = userInput;
+      var temp = entry.clone();
+      temp.comments = userInput;
       try {
-        await DatabaseHelper().updateEntry(entry);
+        await DatabaseHelper().updateEntry(temp);
+        entry.updateFrom(temp);
         setState(() => {});
       } catch (e) {
         showSnackBar(context, 'Error updating entry: $e');
@@ -137,10 +139,12 @@ class _CurrentDayWidgetState extends State<CurrentDayWidget> {
 
   Future<void> onComplete(Entry e, bool? newStatus) async {
     if (newStatus == null) return;
-    e.done = newStatus;
-    e.doneAt = newStatus == true ? DateTime.now() : null;
+    var temp = e.clone();
+    temp.done = newStatus;
+    temp.doneAt = newStatus == true ? DateTime.now() : null;
     try {
-      await DatabaseHelper().updateEntry(e);
+      await DatabaseHelper().updateEntry(temp);
+      e.updateFrom(temp);
       setState(() => {});
     } catch (e) {
       showSnackBar(context, 'Error updating entry: $e');
@@ -215,7 +219,9 @@ class _CurrentDayWidgetState extends State<CurrentDayWidget> {
                       MaterialPageRoute(
                         builder: (context) => StopwatchWidget(entry: entry),
                       ),
-                    );
+                    ).then((_) {
+                      setState(() {});
+                    });
                   },
                   show: entry.habitName
                           .toLowerCase()

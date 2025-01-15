@@ -87,13 +87,15 @@ class _HabitListWidgetState extends State<HabitListWidget> {
         userInput.first != null &&
         userInput.second != null &&
         userInput.preferredQuadrant != null) {
-      habit.name = userInput.first!;
-      habit.comments = userInput.second!;
-      habit.preferredQuadrant = userInput.preferredQuadrant!;
+      Habit temp = habit.clone();
+      temp.name = userInput.first!;
+      temp.comments = userInput.second!;
+      temp.preferredQuadrant = userInput.preferredQuadrant!;
       try {
-        await DatabaseHelper().updateHabit(habit);
+        await DatabaseHelper().updateHabit(temp);
+        habit.updateFrom(temp);
         setState(() => {});
-      } catch(e) {
+      } catch (e) {
         showSnackBar(context, 'Error updating habit: $e');
       }
     }

@@ -533,6 +533,5 @@ def insert_test_data():
 
 
 if __name__ == '__main__':
-    init_db(True)
-    insert_test_data()
+    init_db(False)
     app.run(debug=True)

@@ -49,6 +49,16 @@ class Habit extends Cloneable {
       hid: hid,
     );
   }
+
+  void updateFrom(Habit h) {
+    hid = h.hid;
+    uid = h.uid;
+    name = h.name;
+    comments = h.comments;
+    preferredQuadrant = h.preferredQuadrant;
+    since = h.since;
+    active = h.active;
+  }
 }
 
 class Entry extends Cloneable {
@@ -118,6 +128,18 @@ class Entry extends Cloneable {
       quadrant: quadrant,
     );
   }
+
+  void updateFrom(Entry e) {
+    eid = e.eid;
+    rid = e.rid;
+    hid = e.hid;
+    habitName = e.habitName;
+    comments = e.comments;
+    done = e.done;
+    doneAt = e.doneAt;
+    split = e.split;
+    quadrant = e.quadrant;
+  }
 }
 
 class Record extends Cloneable {
@@ -176,6 +198,16 @@ class Record extends Cloneable {
       q4notes: q4notes,
       entries: deepCopyList<Entry>(entries),
     );
+  }
+
+  void updateFrom(Record r) {
+    date = r.date;
+    rid = r.rid;
+    uid = r.uid;
+    q1notes = r.q1notes;
+    q2notes = r.q2notes;
+    q3notes = r.q3notes;
+    q4notes = r.q4notes;
   }
 }
 

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:chronosculpt/data_structures.dart';
 import 'package:chronosculpt/database_helper.dart';
+import 'package:chronosculpt/main.dart';
 import 'package:chronosculpt/widgets/history.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -122,12 +123,14 @@ class _LiveSplitterState extends State<LiveSplitter> {
       unit.status = LiveSplitStatus.uploadSuccess;
     } catch (e) {
       unit.status = LiveSplitStatus.uploadFailure;
+      showSnackBar(
+          context, 'Error updating entry. Tap the X icon to retry. $e');
     } finally {
       setState(() {
         _enableButton = true;
       });
       if (allUnitsCompleted()) {
-        if (context.mounted) {
+        if (noFailures() && context.mounted) {
           Navigator.of(context).pop();
         }
       } else {
@@ -140,6 +143,13 @@ class _LiveSplitterState extends State<LiveSplitter> {
     for (var unit in units) {
       if (unit.status == LiveSplitStatus.waiting ||
           unit.status == LiveSplitStatus.inProgress) return false;
+    }
+    return true;
+  }
+
+  bool noFailures() {
+    for (var unit in units) {
+      if (unit.status == LiveSplitStatus.uploadFailure) return false;
     }
     return true;
   }
@@ -187,6 +197,18 @@ class _LiveSplitterState extends State<LiveSplitter> {
     setState(() {});
   }
 
+  Future<void> _retryUpload(LiveSplitUnit lsu, BuildContext context) async {
+    try {
+      await DatabaseHelper().updateEntry(lsu.entry);
+      setState(() {
+        lsu.status = LiveSplitStatus.uploadSuccess;
+      });
+    } catch (e) {
+      showSnackBar(
+          context, 'Error updating entry. Tap the X icon to retry. $e');
+    }
+  }
+
   @override
   void dispose() {
     if (_isRunning) {
@@ -230,11 +252,12 @@ class _LiveSplitterState extends State<LiveSplitter> {
                       index: index,
                       child: IgnorePointer(
                         ignoring: _isRunning ||
-                            !(unit.status == LiveSplitStatus.waiting ||
-                                unit.status == LiveSplitStatus.inProgress),
+                            (unit.status == LiveSplitStatus.uploading ||
+                                unit.status == LiveSplitStatus.uploadSuccess),
                         child: LiveSplitTile(
                           unit: unit,
                           deleter: () => _delete(index, context),
+                          retrier: () => _retryUpload(unit, context),
                         ),
                       ),
                     );
@@ -244,11 +267,12 @@ class _LiveSplitterState extends State<LiveSplitter> {
                       index: index,
                       child: IgnorePointer(
                         ignoring: _isRunning ||
-                            !(unit.status == LiveSplitStatus.waiting ||
-                                unit.status == LiveSplitStatus.inProgress),
+                            (unit.status == LiveSplitStatus.uploading ||
+                                unit.status == LiveSplitStatus.uploadSuccess),
                         child: LiveSplitTile(
                           unit: unit,
                           deleter: () => _delete(index, context),
+                          retrier: () => _retryUpload(unit, context),
                         ),
                       ),
                     );
@@ -314,7 +338,13 @@ class _LiveSplitterState extends State<LiveSplitter> {
 class LiveSplitTile extends StatefulWidget {
   final LiveSplitUnit unit;
   final Function deleter;
-  const LiveSplitTile({super.key, required this.unit, required this.deleter});
+  final Function retrier;
+  const LiveSplitTile({
+    super.key,
+    required this.unit,
+    required this.deleter,
+    required this.retrier,
+  });
 
   @override
   State<LiveSplitTile> createState() => _LiveSplitTileState();
@@ -345,7 +375,6 @@ class _LiveSplitTileState extends State<LiveSplitTile> {
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
         hoverColor: Colors.transparent,
-        onTap: () {},
         onHover: (value) {
           setState(() => hovering = value);
         },
@@ -418,7 +447,10 @@ class _LiveSplitTileState extends State<LiveSplitTile> {
       case LiveSplitStatus.uploadSuccess:
         return Icon(Icons.check, color: scheme.secondary);
       case LiveSplitStatus.uploadFailure:
-        return Icon(Icons.close, color: scheme.error);
+        return InkWell(
+          onTap: () => widget.retrier(),
+          child: Icon(Icons.close, color: scheme.error),
+        );
     }
   }
 }
