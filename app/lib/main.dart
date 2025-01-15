@@ -85,7 +85,7 @@ class _MainWidgetState extends State<MainWidget> {
         appBarText = "Habit List";
         break;
       case 3:
-        page = const HistoryWidget();
+        page = const HistoryWidgetWrapper();
         appBarText = "History";
         break;
       default:

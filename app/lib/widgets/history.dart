@@ -4,25 +4,16 @@ import 'package:chronosculpt/widgets/misc_widgets.dart';
 import 'package:chronosculpt/data_structures.dart';
 import 'package:flutter/material.dart';
 
-class HistoryWidget extends StatefulWidget {
-  const HistoryWidget({super.key});
+class HistoryWidgetWrapper extends StatefulWidget {
+  const HistoryWidgetWrapper({super.key});
 
   @override
-  State<HistoryWidget> createState() => _HistoryWidgetState();
+  State<HistoryWidgetWrapper> createState() => _HistoryWidgetWrapperState();
 }
 
-class _HistoryWidgetState extends State<HistoryWidget> {
-  final _selectedView = <bool>[true, false];
-  int view = 0;
-
+class _HistoryWidgetWrapperState extends State<HistoryWidgetWrapper> {
   @override
   Widget build(BuildContext context) {
-    var colorScheme = Theme.of(context).colorScheme;
-    List<Widget> tabs = [];
-    for (int i = 0; i < _selectedView.length; i++) {
-      if (_selectedView[i]) view = i;
-    }
-
     return FutureBuilder<List<Record>>(
       future: DatabaseHelper().getPast30Days(getCurrentUserUid()),
       builder: (context, snapshot) {
@@ -38,66 +29,90 @@ class _HistoryWidgetState extends State<HistoryWidget> {
           return ErrorScreen(message: 'The data was unexpectedly null.');
         }
 
-        if (tabs.isEmpty) {
-          tabs = [
-            PastRecordsWidget(records: snapshot.data!),
-            PastHabitsWidget(records: snapshot.data!)
-          ];
-        }
-
-        return Scaffold(
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-          body: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 30.0, bottom: 8.0),
-                child: ToggleButtons(
-                  borderRadius: BorderRadius.circular(50),
-                  selectedColor: colorScheme.secondary,
-                  color: colorScheme.surface,
-                  fillColor: colorScheme.surface,
-                  constraints: BoxConstraints(
-                    minHeight: 40.0,
-                    minWidth: MediaQuery.of(context).size.width * 0.4,
-                  ),
-                  onPressed: (int index) {
-                    setState(
-                      () {
-                        for (int i = 0; i < _selectedView.length; i++) {
-                          _selectedView[i] = i == index;
-                        }
-                      },
-                    );
-                  },
-                  isSelected: _selectedView,
-                  children: const [
-                    Text(
-                      'Records',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                    Text(
-                      'Habits',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: IndexedStack(
-                  index: view,
-                  children: tabs,
-                ),
-              ),
-            ],
-          ),
-        );
+        return HistoryWidget(records: snapshot.data!,);
       },
+    );
+  }
+}
+
+class HistoryWidget extends StatefulWidget {
+  final List<Record> records;
+  const HistoryWidget({super.key, required this.records});
+
+  @override
+  State<HistoryWidget> createState() => _HistoryWidgetState();
+}
+
+class _HistoryWidgetState extends State<HistoryWidget> {
+  final _selectedView = <bool>[true, false];
+  List<Widget> tabs = [];
+  int view = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    var colorScheme = Theme.of(context).colorScheme;
+    for (int i = 0; i < _selectedView.length; i++) {
+      if (_selectedView[i]) view = i;
+    }
+
+    if (tabs.isEmpty) {
+      tabs = [
+        PastRecordsWidget(records: widget.records),
+        PastHabitsWidget(records: widget.records)
+      ];
+    }
+
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.secondary,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 30.0, bottom: 8.0),
+            child: ToggleButtons(
+              borderRadius: BorderRadius.circular(50),
+              selectedColor: colorScheme.secondary,
+              color: colorScheme.surface,
+              fillColor: colorScheme.surface,
+              constraints: BoxConstraints(
+                minHeight: 40.0,
+                minWidth: MediaQuery.of(context).size.width * 0.4,
+              ),
+              onPressed: (int index) {
+                setState(
+                  () {
+                    for (int i = 0; i < _selectedView.length; i++) {
+                      _selectedView[i] = i == index;
+                    }
+                  },
+                );
+              },
+              isSelected: _selectedView,
+              children: const [
+                Text(
+                  'Records',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                Text(
+                  'Habits',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: IndexedStack(
+              index: view,
+              children: tabs,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -114,6 +129,19 @@ class _PastRecordsWidgetState extends State<PastRecordsWidget> {
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
+
+    if (widget.records.isEmpty) {
+      return Scaffold(
+        backgroundColor: colorScheme.secondary,
+        body: Center(
+          child: Text(
+            'No past records found',
+            style: TextStyle(
+                color: colorScheme.surfaceContainerLowest, fontSize: 20.0),
+          ),
+        ),
+      );
+    }
 
     return ListView.builder(
       itemCount: widget.records.length,
@@ -211,6 +239,19 @@ class _PastHabitsWidgetState extends State<PastHabitsWidget> {
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
+
+    if (widget.records.isEmpty) {
+      return Scaffold(
+        backgroundColor: colorScheme.secondary,
+        body: Center(
+          child: Text(
+            'No past records found',
+            style: TextStyle(
+                color: colorScheme.surfaceContainerLowest, fontSize: 20.0),
+          ),
+        ),
+      );
+    }
 
     PastHabitsWidget.analyzeData(widget.records);
 
