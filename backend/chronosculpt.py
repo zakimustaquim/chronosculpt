@@ -23,11 +23,13 @@ DB_CONFIG = {
     'dbname': os.getenv('DB_NAME')
 }
 
+connection_string = os.getenv('NEON_STRING')
+
 # Create connection pool
 db_pool = SimpleConnectionPool(
-    minconn=5,
-    maxconn=20,
-    **DB_CONFIG
+    1,
+    20,
+    connection_string,
 )
 
 # Get connection from pool
@@ -54,7 +56,7 @@ def close_db(error):
 # Initialize the database and create necessary tables
 def init_db(reset=False):
     # Connect to database
-    conn = psycopg2.connect(**DB_CONFIG)
+    conn = psycopg2.connect(connection_string)
     cursor = conn.cursor()
 
     if (reset):
@@ -441,7 +443,7 @@ def test():
         return jsonify({'error': str(e)}), 500
 
 def insert_test_data():
-    conn = psycopg2.connect(**DB_CONFIG)
+    conn = psycopg2.connect(connection_string)
     cursor = conn.cursor()
 
     # Habits
@@ -533,5 +535,5 @@ def insert_test_data():
 
 
 if __name__ == '__main__':
-    init_db(False)
+    init_db()
     app.run(debug=True)
