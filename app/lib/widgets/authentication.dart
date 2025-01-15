@@ -17,7 +17,7 @@ class _AuthenticationWidgetState extends State<AuthenticationWidget> {
 
     return Scaffold(
       backgroundColor: colorScheme.secondary,
-      body: Center(
+      body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -43,7 +43,7 @@ class _LogoDisplayState extends State<LogoDisplay> {
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
         setState(() {
           _visible = true;
@@ -53,7 +53,7 @@ class _LogoDisplayState extends State<LogoDisplay> {
 
     return AnimatedOpacity(
       opacity: _visible ? 1.0 : 0.0,
-      duration: Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 2000),
       curve: Curves.easeIn,
       child: Column(
         children: [
@@ -86,14 +86,14 @@ class _LoginSignupButtonsState extends State<LoginSignupButtons> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => SignupScreen(),
+          builder: (context) => const SignupScreen(),
         ),
       );
     } else {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => LoginScreen(),
+          builder: (context) => const LoginScreen(),
         ),
       );
     }
@@ -103,7 +103,7 @@ class _LoginSignupButtonsState extends State<LoginSignupButtons> {
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
 
-    Future.delayed(Duration(milliseconds: 2000), () {
+    Future.delayed(const Duration(milliseconds: 2000), () {
       if (mounted) {
         setState(() {
           _visible = true;
@@ -113,7 +113,7 @@ class _LoginSignupButtonsState extends State<LoginSignupButtons> {
 
     return AnimatedOpacity(
       opacity: _visible ? 1.0 : 0.0,
-      duration: Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 1000),
       curve: Curves.easeIn,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -125,7 +125,7 @@ class _LoginSignupButtonsState extends State<LoginSignupButtons> {
               style: TextStyle(color: colorScheme.secondary),
             ),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           ElevatedButton(
             onPressed: () => startActivity('Login'),
             child: Text(
@@ -221,7 +221,7 @@ class _SignupScreenState extends State<SignupScreen> {
       if (!rememberMe) SharedPreferencesHelper().setToForget();
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => MainWidget()),
+        MaterialPageRoute(builder: (context) => const MainWidget()),
         (Route<dynamic> route) => false, // Removes all previous routes
       );
     }
@@ -235,7 +235,7 @@ class _SignupScreenState extends State<SignupScreen> {
       backgroundColor: colorScheme.secondary,
       body: Center(
         child: Container(
-          constraints: BoxConstraints(
+          constraints: const BoxConstraints(
             maxWidth: 240,
           ),
           child: Column(
@@ -249,27 +249,27 @@ class _SignupScreenState extends State<SignupScreen> {
                   fontSize: 24.0,
                 ),
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               ChronosculptTextField(
                 controller: emailController,
                 hintText: 'Email',
                 onSubmit: (_) => signUp(context),
               ),
-              SizedBox(height: 12.0),
+              const SizedBox(height: 12.0),
               ChronosculptTextField(
                 controller: passController,
                 hintText: 'Password',
                 obscure: true,
                 onSubmit: (_) => signUp(context),
               ),
-              SizedBox(height: 12.0),
+              const SizedBox(height: 12.0),
               ChronosculptTextField(
                 controller: confPassController,
                 hintText: 'Confirm Password',
                 obscure: true,
                 onSubmit: (_) => signUp(context),
               ),
-              SizedBox(height: 12.0),
+              const SizedBox(height: 12.0),
               Row(
                 children: [
                   Expanded(
@@ -292,7 +292,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: () => signUp(context),
                 child: Text(
@@ -328,7 +328,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!rememberMe) SharedPreferencesHelper().setToForget();
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => MainWidget()),
+        MaterialPageRoute(builder: (context) => const MainWidget()),
         (Route<dynamic> route) => false, // Removes all previous routes
       );
     }
@@ -342,7 +342,7 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: colorScheme.secondary,
       body: Center(
         child: Container(
-          constraints: BoxConstraints(
+          constraints: const BoxConstraints(
             maxWidth: 240,
           ),
           child: Column(
@@ -356,20 +356,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   fontSize: 24.0,
                 ),
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               ChronosculptTextField(
                 controller: emailController,
                 hintText: 'Email',
                 onSubmit: (_) => logIn(context),
               ),
-              SizedBox(height: 12.0),
+              const SizedBox(height: 12.0),
               ChronosculptTextField(
                 controller: passController,
                 hintText: 'Password',
                 obscure: true,
                 onSubmit: (_) => logIn(context),
               ),
-              SizedBox(height: 12.0),
+              const SizedBox(height: 12.0),
               Row(
                 children: [
                   Expanded(
@@ -392,7 +392,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: () => logIn(context),
                 child: Text(

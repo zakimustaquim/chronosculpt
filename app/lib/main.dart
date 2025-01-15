@@ -43,6 +43,7 @@ class ChronosculptApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color.fromARGB(255, 174, 85, 196),
+          surface: const Color.fromARGB(255, 247, 239, 243),
         ),
         useMaterial3: true,
       ),
@@ -65,28 +66,40 @@ class _MainWidgetState extends State<MainWidget> {
 
   @override
   Widget build(BuildContext context) {
+    var colorScheme = Theme.of(context).colorScheme;
+
     if (!FirebaseHelper().authenticated()) {
       return const AuthenticationWidget();
     }
 
     Widget page;
     String appBarText = '';
+    Color appBarColor = Colors.transparent;
+    Color textColor = Colors.transparent;
     switch (selectedIndex) {
       case 0:
         page = const LogWidget();
         appBarText = "Log";
+        appBarColor = colorScheme.secondary;
+        textColor = colorScheme.surface;
         break;
       case 1:
         page = const InteractiveSchedulerWrapper();
         appBarText = "Interactive Scheduler";
+        appBarColor = colorScheme.surface;
+        textColor = colorScheme.secondary;
         break;
       case 2:
         page = const HabitListWrapper();
         appBarText = "Habit List";
+        appBarColor = colorScheme.surface;
+        textColor = colorScheme.secondary;
         break;
       case 3:
         page = const HistoryWidgetWrapper();
         appBarText = "History";
+        appBarColor = colorScheme.secondary;
+        textColor = colorScheme.surface;
         break;
       default:
         page = const ErrorScreen(message: '404 Page Not Found');
@@ -103,14 +116,24 @@ class _MainWidgetState extends State<MainWidget> {
     applicationContext ??= context;
     return Scaffold(
       appBar: AppBar(
-        title: Text(appBarText),
+        backgroundColor: appBarColor,
+        centerTitle: true,
+        title: Text(
+          appBarText,
+          style: TextStyle(color: textColor),
+        ),
         actions: [
           ElevatedButton(
-              onPressed: () async {
-                await FirebaseHelper().signOut();
-                setState(() {});
-              },
-              child: Text('Sign Out')),
+            onPressed: () async {
+              await FirebaseHelper().signOut();
+              setState(() {});
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: textColor),
+            child: Text(
+              'Sign Out',
+              style: TextStyle(color: appBarColor),
+            ),
+          ),
         ],
       ),
       body: Column(

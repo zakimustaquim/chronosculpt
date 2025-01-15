@@ -26,7 +26,7 @@ class _HistoryWidgetWrapperState extends State<HistoryWidgetWrapper> {
         }
 
         if (snapshot.data == null) {
-          return ErrorScreen(message: 'The data was unexpectedly null.');
+          return const ErrorScreen(message: 'The data was unexpectedly null.');
         }
 
         return HistoryWidget(records: snapshot.data!,);
@@ -67,7 +67,7 @@ class _HistoryWidgetState extends State<HistoryWidget> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 30.0, bottom: 8.0),
+            padding: const EdgeInsets.only(top: 4.0, bottom: 8.0),
             child: ToggleButtons(
               borderRadius: BorderRadius.circular(50),
               selectedColor: colorScheme.secondary,

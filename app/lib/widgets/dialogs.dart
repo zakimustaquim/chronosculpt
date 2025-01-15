@@ -131,11 +131,11 @@ class Dialogs {
         return AlertDialog(
           backgroundColor: colorScheme.onError,
           title: const Text('Are you sure?'),
-          content: SingleChildScrollView(
+          content: const SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                const Text('This action will permanently delete this habit.'),
-                const Text('This cannot be undone.'),
+                Text('This action will permanently delete this habit.'),
+                Text('This cannot be undone.'),
               ],
             ),
           ),

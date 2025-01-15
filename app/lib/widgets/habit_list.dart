@@ -34,7 +34,7 @@ class _HabitListWrapperState extends State<HabitListWrapper> {
           );
         }
 
-        return ErrorScreen(message: 'The data was unexpectedly null.');
+        return const ErrorScreen(message: 'The data was unexpectedly null.');
       },
     );
   }
@@ -139,7 +139,7 @@ class _HabitListWidgetState extends State<HabitListWidget> {
       floatingActionButton: ChronosculptFloatingActionButton(
         onPressed: () => onAdd(context, widget.habits),
         colorScheme: colorScheme,
-        icon: Icon(Icons.add),
+        icon: const Icon(Icons.add),
       ),
       body: Column(
         children: [
@@ -147,7 +147,7 @@ class _HabitListWidgetState extends State<HabitListWidget> {
             padding: const EdgeInsets.only(
               left: 28.0,
               right: 28.0,
-              top: 30.0,
+              top: 4.0,
               bottom: 12.0,
             ),
             child: TextField(
@@ -175,7 +175,7 @@ class _HabitListWidgetState extends State<HabitListWidget> {
           ),
           Expanded(
             child: widget.habits.isEmpty
-                ? Center(child: Text('No habits found'))
+                ? const Center(child: Text('No habits found'))
                 : ListView.builder(
                     itemCount: widget.habits.length,
                     itemBuilder: (context, i) {

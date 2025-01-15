@@ -49,7 +49,7 @@ class _InteractiveSchedulerWrapperState
               }
 
               if (snapshot.data == null) {
-                return ErrorScreen(message: 'Unexpected null value');
+                return const ErrorScreen(message: 'Unexpected null value');
               }
 
               if (snapshot.data!.isEmpty) {
@@ -356,10 +356,10 @@ class _QuadrantContainerState extends State<QuadrantContainer> {
 
     return Padding(
       padding: const EdgeInsets.only(
-        top: 8.0,
+        top: 4.0,
         left: 10.0,
         right: 10.0,
-        bottom: 8.0,
+        bottom: 12.0,
       ),
       child: InkWell(
         splashColor: Colors.transparent,

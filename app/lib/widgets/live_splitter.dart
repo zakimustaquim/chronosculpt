@@ -224,12 +224,10 @@ class _LiveSplitterState extends State<LiveSplitter> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Text(
-            'LiveSplitter',
-            style: TextStyle(color: colorScheme.secondary),
-          ),
+        centerTitle: true,
+        title: Text(
+          'LiveSplitter',
+          style: TextStyle(color: colorScheme.secondary),
         ),
         backgroundColor: colorScheme.surface,
       ),
@@ -404,7 +402,7 @@ class _LiveSplitTileState extends State<LiveSplitTile> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(averageSplitText, style: textStyle),
-                    const SizedBox(width: 4.0),
+                    const SizedBox(width: 6.0),
                     Text(minSplitText, style: textStyle),
                     const SizedBox(width: 8.0),
                     getStatusWidget(colorScheme),

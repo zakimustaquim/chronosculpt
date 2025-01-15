@@ -30,7 +30,7 @@ class _LogWidgetState extends State<LogWidget> {
         }
 
         if (snapshot.data == null) {
-          return ErrorScreen(message: 'The data was unexpectedly null.');
+          return const ErrorScreen(message: 'The data was unexpectedly null.');
         }
 
         if (snapshot.data!.isNotEmpty) {
@@ -94,7 +94,7 @@ class NoRecordFoundWidget extends StatelessWidget {
       floatingActionButton: ChronosculptFloatingActionButton(
         onPressed: () => onAddRecord(context),
         colorScheme: colorScheme,
-        icon: Icon(Icons.add),
+        icon: const Icon(Icons.add),
       ),
     );
   }
@@ -164,7 +164,7 @@ class _CurrentDayWidgetState extends State<CurrentDayWidget> {
             padding: const EdgeInsets.only(
               left: 28.0,
               right: 28.0,
-              top: 30.0,
+              top: 4.0,
               bottom: 12.0,
             ),
             child: Theme(
