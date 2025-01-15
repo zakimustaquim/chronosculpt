@@ -26,5 +26,7 @@ class FirebaseHelper {
 
   Future<void> signOut() async => await fa.signOut();
 
-  bool authenticated() => fa.currentUser != null;
+  bool authenticated() {
+    return fa.currentUser != null;
+  }
 }

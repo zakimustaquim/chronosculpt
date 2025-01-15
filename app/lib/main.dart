@@ -71,7 +71,7 @@ class _MainWidgetState extends State<MainWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (FirebaseHelper().authenticated()) {
+    if (!FirebaseHelper().authenticated()) {
       return const AuthenticationWidget();
     }
 
@@ -83,7 +83,7 @@ class _MainWidgetState extends State<MainWidget> {
         appBarText = "Log";
         break;
       case 1:
-        page = const InteractiveSchedulerWidget();
+        page = const InteractiveSchedulerWrapper();
         appBarText = "Interactive Scheduler";
         break;
       case 2:

@@ -219,6 +219,15 @@ class _SignupScreenState extends State<SignupScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Text(
+                'Sign Up',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.surface,
+                  fontSize: 24.0,
+                ),
+              ),
+              SizedBox(height: 16.0),
               ChronosculptTextField(
                 controller: emailController,
                 hintText: 'Email',

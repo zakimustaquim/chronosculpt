@@ -116,22 +116,22 @@ class _CurrentDayWidgetState extends State<CurrentDayWidget> {
     required BuildContext context,
     required Entry entry,
   }) async {
-    var userInput = await Dialogs.showEditDialog(
+    var userInput = await Dialogs.showSchedulingDialog(
       context: context,
       title: 'Edit Habit Details',
-      showQuadrantSelection: false,
-      initialQuadrant: 0,
-      initialValue1: entry.habitName,
-      initialValue2: entry.comments,
+      entries: [],
+      initialValue: entry.comments,
+      quadrant: -1,
     );
 
-    if (userInput != null &&
-        userInput.first != null &&
-        userInput.second != null) {
-      entry.habitName = userInput.first!;
-      entry.comments = userInput.second!;
-      await DatabaseHelper().updateEntry(entry);
-      setState(() => {});
+    if (userInput != null) {
+      entry.comments = userInput;
+      try {
+        await DatabaseHelper().updateEntry(entry);
+        setState(() => {});
+      } catch (e) {
+        showSnackBar(context, 'Error updating entry: $e');
+      }
     }
   }
 
@@ -139,8 +139,12 @@ class _CurrentDayWidgetState extends State<CurrentDayWidget> {
     if (newStatus == null) return;
     e.done = newStatus;
     e.doneAt = newStatus == true ? DateTime.now() : null;
-    await DatabaseHelper().updateEntry(e);
-    setState(() => {});
+    try {
+      await DatabaseHelper().updateEntry(e);
+      setState(() => {});
+    } catch (e) {
+      showSnackBar(context, 'Error updating entry: $e');
+    }
   }
 
   @override

@@ -8,18 +8,16 @@ import 'package:chronosculpt/widgets/misc_widgets.dart';
 import 'package:chronosculpt/widgets/stopwatch.dart';
 import 'package:flutter/material.dart';
 
-class InteractiveSchedulerWidget extends StatefulWidget {
-  const InteractiveSchedulerWidget({super.key});
+class InteractiveSchedulerWrapper extends StatefulWidget {
+  const InteractiveSchedulerWrapper({super.key});
 
   @override
-  State<InteractiveSchedulerWidget> createState() =>
-      _InteractiveSchedulerWidgetState();
+  State<InteractiveSchedulerWrapper> createState() =>
+      _InteractiveSchedulerWrapperState();
 }
 
-class _InteractiveSchedulerWidgetState
-    extends State<InteractiveSchedulerWidget> {
-  final ScrollController scrollController = ScrollController();
-
+class _InteractiveSchedulerWrapperState
+    extends State<InteractiveSchedulerWrapper> {
   void stateSetter() {
     setState(() {});
   }
@@ -60,125 +58,144 @@ class _InteractiveSchedulerWidgetState
                 });
               }
 
-              List<List<Entry>> stratifiedList = [
-                <Entry>[],
-                <Entry>[],
-                <Entry>[],
-                <Entry>[],
-                <Entry>[],
-                <Entry>[],
-              ];
-
-              Record r = snapshot.data![0];
-
-              for (var entry in r.entries) {
-                if (entry.done) {
-                  stratifiedList[5].add(entry);
-                } else {
-                  stratifiedList[entry.quadrant].add(entry);
-                }
-              }
-
-              double donePercentage = stratifiedList[5].length /
-                  (stratifiedList[0].length +
-                      stratifiedList[1].length +
-                      stratifiedList[2].length +
-                      stratifiedList[3].length +
-                      stratifiedList[4].length +
-                      stratifiedList[5].length);
-
-              return SingleChildScrollView(
-                controller: scrollController,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    const SizedBox(height: 16.0),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: QuadrantContainer(
-                            entries: stratifiedList[0],
-                            quadrant: 0,
-                            scrollController: scrollController,
-                            record: r,
-                            refresher: () => stateSetter(),
-                          ),
-                        ),
-                      ],
-                    ),
-                    IntrinsicHeight(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(
-                            child: QuadrantContainer(
-                              entries: stratifiedList[1],
-                              quadrant: 1,
-                              scrollController: scrollController,
-                              record: r,
-                              refresher: () => stateSetter(),
-                            ),
-                          ),
-                          Expanded(
-                            child: QuadrantContainer(
-                              entries: stratifiedList[2],
-                              quadrant: 2,
-                              scrollController: scrollController,
-                              record: r,
-                              refresher: () => stateSetter(),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    IntrinsicHeight(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Expanded(
-                            child: QuadrantContainer(
-                              entries: stratifiedList[3],
-                              quadrant: 3,
-                              scrollController: scrollController,
-                              record: r,
-                              refresher: () => stateSetter(),
-                            ),
-                          ),
-                          Expanded(
-                            child: QuadrantContainer(
-                              entries: stratifiedList[4],
-                              quadrant: 4,
-                              scrollController: scrollController,
-                              record: r,
-                              refresher: () => stateSetter(),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: QuadrantContainer(
-                            entries: stratifiedList[5],
-                            quadrant: 5,
-                            scrollController: scrollController,
-                            donePercentage: donePercentage,
-                            record: r,
-                            refresher: () => stateSetter(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              );
+              return InteractiveSchedulerWidget(r: snapshot.data![0]);
             },
           )),
+        ],
+      ),
+    );
+  }
+}
+
+class InteractiveSchedulerWidget extends StatefulWidget {
+  final Record r;
+  const InteractiveSchedulerWidget({super.key, required this.r});
+
+  @override
+  State<InteractiveSchedulerWidget> createState() =>
+      _InteractiveSchedulerWidgetState();
+}
+
+class _InteractiveSchedulerWidgetState
+    extends State<InteractiveSchedulerWidget> {
+  final ScrollController scrollController = ScrollController();
+
+  void stateSetter() => setState(() {});
+
+  @override
+  Widget build(BuildContext context) {
+    List<List<Entry>> stratifiedList = [
+      <Entry>[],
+      <Entry>[],
+      <Entry>[],
+      <Entry>[],
+      <Entry>[],
+      <Entry>[],
+    ];
+
+    for (var entry in widget.r.entries) {
+      if (entry.done) {
+        stratifiedList[5].add(entry);
+      } else {
+        stratifiedList[entry.quadrant].add(entry);
+      }
+    }
+
+    double donePercentage = stratifiedList[5].length /
+        (stratifiedList[0].length +
+            stratifiedList[1].length +
+            stratifiedList[2].length +
+            stratifiedList[3].length +
+            stratifiedList[4].length +
+            stratifiedList[5].length);
+
+    return SingleChildScrollView(
+      controller: scrollController,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          const SizedBox(height: 16.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: QuadrantContainer(
+                  entries: stratifiedList[0],
+                  quadrant: 0,
+                  scrollController: scrollController,
+                  record: widget.r,
+                  refresher: () => stateSetter(),
+                ),
+              ),
+            ],
+          ),
+          IntrinsicHeight(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: QuadrantContainer(
+                    entries: stratifiedList[1],
+                    quadrant: 1,
+                    scrollController: scrollController,
+                    record: widget.r,
+                    refresher: () => stateSetter(),
+                  ),
+                ),
+                Expanded(
+                  child: QuadrantContainer(
+                    entries: stratifiedList[2],
+                    quadrant: 2,
+                    scrollController: scrollController,
+                    record: widget.r,
+                    refresher: () => stateSetter(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                  child: QuadrantContainer(
+                    entries: stratifiedList[3],
+                    quadrant: 3,
+                    scrollController: scrollController,
+                    record: widget.r,
+                    refresher: () => stateSetter(),
+                  ),
+                ),
+                Expanded(
+                  child: QuadrantContainer(
+                    entries: stratifiedList[4],
+                    quadrant: 4,
+                    scrollController: scrollController,
+                    record: widget.r,
+                    refresher: () => stateSetter(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: QuadrantContainer(
+                  entries: stratifiedList[5],
+                  quadrant: 5,
+                  scrollController: scrollController,
+                  donePercentage: donePercentage,
+                  record: widget.r,
+                  refresher: () => stateSetter(),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -251,8 +268,12 @@ class _QuadrantContainerState extends State<QuadrantContainer> {
             widget.record.q4notes = newComments;
             break;
         }
-        await DatabaseHelper().updateRecord(widget.record);
-        widget.refresher();
+        try {
+          await DatabaseHelper().updateRecord(widget.record);
+          widget.refresher();
+        } catch (e) {
+          showSnackBar(context, 'Error updating notes: $e');
+        }
       }
     } catch (e) {
       showSnackBar(context, e.toString());
@@ -398,8 +419,12 @@ class _QuadrantContainerState extends State<QuadrantContainer> {
               entry.done = true;
               entry.doneAt = DateTime.now();
             }
-            await DatabaseHelper().updateEntry(entry);
-            widget.refresher();
+            try {
+              await DatabaseHelper().updateEntry(entry);
+              widget.refresher();
+            } catch (e) {
+              showSnackBar(context, 'Error updating entry: $e');
+            }
           },
         ),
       ),

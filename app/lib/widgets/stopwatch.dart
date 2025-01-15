@@ -117,8 +117,12 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
     }
 
     widget.entry.split = newSplit;
-    await DatabaseHelper().updateEntry(widget.entry);
-    if (context.mounted) Navigator.of(context).pop();
+    try {
+      await DatabaseHelper().updateEntry(widget.entry);
+      if (context.mounted) Navigator.of(context).pop();
+    } catch (e) {
+      showSnackBar(context, 'Error updating entry: $e');
+    }
   }
 
   Widget getTextField(

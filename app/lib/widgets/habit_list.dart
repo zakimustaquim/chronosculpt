@@ -63,11 +63,11 @@ class _HabitListWidgetState extends State<HabitListWidget> {
       try {
         await DatabaseHelper().deleteHabit(habit);
         habitsList.removeWhere((element) => element == habit);
+        setState(() {});
       } catch (e) {
-        showSnackBar(context, e.toString());
+        showSnackBar(context, 'Error updating habit: $e');
       }
     }
-    setState(() {});
   }
 
   Future<void> onEdit({
@@ -90,8 +90,12 @@ class _HabitListWidgetState extends State<HabitListWidget> {
       habit.name = userInput.first!;
       habit.comments = userInput.second!;
       habit.preferredQuadrant = userInput.preferredQuadrant!;
-      await DatabaseHelper().updateHabit(habit);
-      setState(() => {});
+      try {
+        await DatabaseHelper().updateHabit(habit);
+        setState(() => {});
+      } catch(e) {
+        showSnackBar(context, 'Error updating habit: $e');
+      }
     }
   }
 

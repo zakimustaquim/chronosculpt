@@ -233,7 +233,7 @@ class Dialogs {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Notes for Quadrant $quadrant',
+                quadrant == -1 ? '' : 'Notes for Quadrant $quadrant',
                 style: const TextStyle(fontSize: 16),
               ),
               (kIsWeb ? habitInfo : const SizedBox()),
