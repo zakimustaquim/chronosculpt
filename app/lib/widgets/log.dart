@@ -6,14 +6,16 @@ import 'package:chronosculpt/data_structures.dart';
 import 'package:chronosculpt/database_helper.dart';
 import 'package:chronosculpt/widgets/misc_widgets.dart';
 
-class LogWidget extends StatefulWidget {
-  const LogWidget({super.key});
+/// Wrapper widget that retrieves the current record
+/// from the database and passes it to the main log widget.
+class LogWidgetWrapper extends StatefulWidget {
+  const LogWidgetWrapper({super.key});
 
   @override
-  State<LogWidget> createState() => _LogWidgetState();
+  State<LogWidgetWrapper> createState() => _LogWidgetWrapperState();
 }
 
-class _LogWidgetState extends State<LogWidget> {
+class _LogWidgetWrapperState extends State<LogWidgetWrapper> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Record>>(
@@ -34,7 +36,7 @@ class _LogWidgetState extends State<LogWidget> {
         }
 
         if (snapshot.data!.isNotEmpty) {
-          return CurrentDayWidget(
+          return LogWidget(
             recordsList: snapshot.data!,
           );
         } else {
@@ -47,11 +49,13 @@ class _LogWidgetState extends State<LogWidget> {
   }
 }
 
+/// Runs when the user has not created a record for the
+/// current day. 
 class NoRecordFoundWidget extends StatelessWidget {
   final Function refresher;
   const NoRecordFoundWidget({super.key, required this.refresher});
 
-  Future<void> onAddRecord(BuildContext context) async {
+  Future<void> _onAddRecord(BuildContext context) async {
     try {
       await DatabaseHelper().createRecordForCurrentDay(getCurrentUserUid());
       refresher();
@@ -92,7 +96,7 @@ class NoRecordFoundWidget extends StatelessWidget {
         ),
       ),
       floatingActionButton: ChronosculptFloatingActionButton(
-        onPressed: () => onAddRecord(context),
+        onPressed: () => _onAddRecord(context),
         colorScheme: colorScheme,
         icon: const Icon(Icons.add),
       ),
@@ -100,19 +104,20 @@ class NoRecordFoundWidget extends StatelessWidget {
   }
 }
 
-class CurrentDayWidget extends StatefulWidget {
+/// Displays all entries for the current day as cards.
+class LogWidget extends StatefulWidget {
   final List<Record> recordsList;
-  const CurrentDayWidget({super.key, required this.recordsList});
+  const LogWidget({super.key, required this.recordsList});
 
   @override
-  State<CurrentDayWidget> createState() => _CurrentDayWidgetState();
+  State<LogWidget> createState() => _LogWidgetState();
 }
 
-class _CurrentDayWidgetState extends State<CurrentDayWidget> {
-  String searchQuery = "";
-  var controller = TextEditingController();
+class _LogWidgetState extends State<LogWidget> {
+  String _searchQuery = "";
+  final _controller = TextEditingController();
 
-  Future<void> onEdit({
+  Future<void> _onEdit({
     required BuildContext context,
     required Entry entry,
   }) async {
@@ -137,7 +142,7 @@ class _CurrentDayWidgetState extends State<CurrentDayWidget> {
     }
   }
 
-  Future<void> onComplete(Entry e, bool? newStatus) async {
+  Future<void> _onComplete(Entry e, bool? newStatus) async {
     if (newStatus == null) return;
     var temp = e.clone();
     temp.done = newStatus;
@@ -175,7 +180,7 @@ class _CurrentDayWidgetState extends State<CurrentDayWidget> {
               ),
               child: TextField(
                 cursorColor: colorScheme.surface,
-                controller: controller,
+                controller: _controller,
                 decoration: InputDecoration(
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
@@ -196,7 +201,7 @@ class _CurrentDayWidgetState extends State<CurrentDayWidget> {
                 style: TextStyle(color: colorScheme.surface),
                 onChanged: (value) {
                   setState(() {
-                    searchQuery = value;
+                    _searchQuery = value;
                   });
                 },
               ),
@@ -212,7 +217,7 @@ class _CurrentDayWidgetState extends State<CurrentDayWidget> {
                   textColor: colorScheme.secondary,
                   title: entry.habitName,
                   comments: entry.comments,
-                  onTap: () => onEdit(context: context, entry: entry),
+                  onTap: () => _onEdit(context: context, entry: entry),
                   onLongPress: () {
                     Navigator.push(
                       context,
@@ -225,10 +230,10 @@ class _CurrentDayWidgetState extends State<CurrentDayWidget> {
                   },
                   show: entry.habitName
                           .toLowerCase()
-                          .contains(searchQuery.toLowerCase()) ||
+                          .contains(_searchQuery.toLowerCase()) ||
                       entry.comments
                           .toLowerCase()
-                          .contains(searchQuery.toLowerCase()),
+                          .contains(_searchQuery.toLowerCase()),
                   topRightWidget: Padding(
                     padding: const EdgeInsets.only(
                       left: 10.0,
@@ -239,7 +244,7 @@ class _CurrentDayWidgetState extends State<CurrentDayWidget> {
                       child: Checkbox(
                         shape: const CircleBorder(),
                         value: entry.done,
-                        onChanged: (b) => onComplete(entry, b),
+                        onChanged: (b) => _onComplete(entry, b),
                       ),
                     ),
                   ),

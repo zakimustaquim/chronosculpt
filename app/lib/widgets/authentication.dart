@@ -3,14 +3,16 @@ import 'package:chronosculpt/shared_preferences_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:chronosculpt/firebase_helper.dart';
 
-class AuthenticationWidget extends StatefulWidget {
-  const AuthenticationWidget({super.key});
+/// Main splash screen for the app, shown on first launch
+/// and whenever unauthenticated.
+class SplashWidget extends StatefulWidget {
+  const SplashWidget({super.key});
 
   @override
-  State<AuthenticationWidget> createState() => _AuthenticationWidgetState();
+  State<SplashWidget> createState() => _SplashWidgetState();
 }
 
-class _AuthenticationWidgetState extends State<AuthenticationWidget> {
+class _SplashWidgetState extends State<SplashWidget> {
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
@@ -31,6 +33,8 @@ class _AuthenticationWidgetState extends State<AuthenticationWidget> {
   }
 }
 
+/// Displays an animation showing the logo
+/// fade in after a delay.
 class LogoDisplay extends StatefulWidget {
   const LogoDisplay({super.key});
 
@@ -71,6 +75,9 @@ class _LogoDisplayState extends State<LogoDisplay> {
   }
 }
 
+/// Contains the login and signup buttons and
+/// also displays an animated fade-in after
+/// a delay.
 class LoginSignupButtons extends StatefulWidget {
   const LoginSignupButtons({super.key});
 
@@ -81,7 +88,7 @@ class LoginSignupButtons extends StatefulWidget {
 class _LoginSignupButtonsState extends State<LoginSignupButtons> {
   bool _visible = false;
 
-  void startActivity(String type) {
+  void _startActivity(String type) {
     if (type == 'Sign Up') {
       Navigator.push(
         context,
@@ -119,7 +126,7 @@ class _LoginSignupButtonsState extends State<LoginSignupButtons> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ElevatedButton(
-            onPressed: () => startActivity('Sign Up'),
+            onPressed: () => _startActivity('Sign Up'),
             child: Text(
               'Sign Up',
               style: TextStyle(color: colorScheme.secondary),
@@ -127,7 +134,7 @@ class _LoginSignupButtonsState extends State<LoginSignupButtons> {
           ),
           const SizedBox(width: 8),
           ElevatedButton(
-            onPressed: () => startActivity('Login'),
+            onPressed: () => _startActivity('Login'),
             child: Text(
               'Login',
               style: TextStyle(color: colorScheme.secondary),
@@ -139,6 +146,7 @@ class _LoginSignupButtonsState extends State<LoginSignupButtons> {
   }
 }
 
+/// Text field used in the login/signup forms.
 class ChronosculptTextField extends StatefulWidget {
   final TextEditingController controller;
   final String hintText;
@@ -195,6 +203,7 @@ class ChronosculptTextFieldState extends State<ChronosculptTextField> {
   }
 }
 
+/// Main screen enabling registering of new accounts.
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
@@ -203,22 +212,22 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  var emailController = TextEditingController();
-  var passController = TextEditingController();
-  var confPassController = TextEditingController();
-  var rememberMe = false;
+  final _emailController = TextEditingController();
+  final _passController = TextEditingController();
+  final _confPassController = TextEditingController();
+  var _rememberMe = false;
 
-  Future<void> signUp(BuildContext context) async {
-    if (passController.text != confPassController.text) {
+  Future<void> _signUp(BuildContext context) async {
+    if (_passController.text != _confPassController.text) {
       showSnackBar(context, 'The passwords do not match.');
       return;
     }
 
     await FirebaseHelper()
-        .createUser(emailController.text, passController.text, context);
+        .createUser(_emailController.text, _passController.text, context);
 
     if (getCurrentUserUid() != 'none') {
-      if (!rememberMe) SharedPreferencesHelper().setToForget();
+      if (!_rememberMe) SharedPreferencesHelper().setToForget();
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const MainWidget()),
@@ -251,23 +260,23 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               const SizedBox(height: 16.0),
               ChronosculptTextField(
-                controller: emailController,
+                controller: _emailController,
                 hintText: 'Email',
-                onSubmit: (_) => signUp(context),
+                onSubmit: (_) => _signUp(context),
               ),
               const SizedBox(height: 12.0),
               ChronosculptTextField(
-                controller: passController,
+                controller: _passController,
                 hintText: 'Password',
                 obscure: true,
-                onSubmit: (_) => signUp(context),
+                onSubmit: (_) => _signUp(context),
               ),
               const SizedBox(height: 12.0),
               ChronosculptTextField(
-                controller: confPassController,
+                controller: _confPassController,
                 hintText: 'Confirm Password',
                 obscure: true,
-                onSubmit: (_) => signUp(context),
+                onSubmit: (_) => _signUp(context),
               ),
               const SizedBox(height: 12.0),
               Row(
@@ -283,10 +292,10 @@ class _SignupScreenState extends State<SignupScreen> {
                       return colorScheme.secondaryContainer;
                     }),
                     checkColor: Colors.black,
-                    value: rememberMe,
+                    value: _rememberMe,
                     onChanged: (b) => setState(
                       () {
-                        rememberMe = b ?? false;
+                        _rememberMe = b ?? false;
                       },
                     ),
                   ),
@@ -294,7 +303,7 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               const SizedBox(height: 16.0),
               ElevatedButton(
-                onPressed: () => signUp(context),
+                onPressed: () => _signUp(context),
                 child: Text(
                   'Submit',
                   style: TextStyle(color: colorScheme.secondary),
@@ -308,6 +317,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 }
 
+/// Main screen enabling authentication of existing accounts.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -316,16 +326,16 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  var rememberMe = false;
-  var emailController = TextEditingController();
-  var passController = TextEditingController();
+  var _rememberMe = false;
+  final _emailController = TextEditingController();
+  final _passController = TextEditingController();
 
-  Future<void> logIn(BuildContext context) async {
+  Future<void> _logIn(BuildContext context) async {
     await FirebaseHelper()
-        .logIn(emailController.text, passController.text, context);
+        .logIn(_emailController.text, _passController.text, context);
 
     if (getCurrentUserUid() != 'none') {
-      if (!rememberMe) SharedPreferencesHelper().setToForget();
+      if (!_rememberMe) SharedPreferencesHelper().setToForget();
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const MainWidget()),
@@ -358,16 +368,16 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 16.0),
               ChronosculptTextField(
-                controller: emailController,
+                controller: _emailController,
                 hintText: 'Email',
-                onSubmit: (_) => logIn(context),
+                onSubmit: (_) => _logIn(context),
               ),
               const SizedBox(height: 12.0),
               ChronosculptTextField(
-                controller: passController,
+                controller: _passController,
                 hintText: 'Password',
                 obscure: true,
-                onSubmit: (_) => logIn(context),
+                onSubmit: (_) => _logIn(context),
               ),
               const SizedBox(height: 12.0),
               Row(
@@ -383,10 +393,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       return colorScheme.secondaryContainer;
                     }),
                     checkColor: Colors.black,
-                    value: rememberMe,
+                    value: _rememberMe,
                     onChanged: (b) => setState(
                       () {
-                        rememberMe = b ?? false;
+                        _rememberMe = b ?? false;
                       },
                     ),
                   ),
@@ -394,7 +404,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 16.0),
               ElevatedButton(
-                onPressed: () => logIn(context),
+                onPressed: () => _logIn(context),
                 child: Text(
                   'Submit',
                   style: TextStyle(color: colorScheme.secondary),

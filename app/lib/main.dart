@@ -11,8 +11,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-// global variables
-
+/// Before running the app, initialize Firebase
+/// and sign out if the user requested it on login.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -22,17 +22,20 @@ void main() async {
   runApp(const ChronosculptApp());
 }
 
+/// Returns the user ID of the currently logged in user.
 String getCurrentUserUid() {
   var currentUser = FirebaseAuth.instance.currentUser;
   return currentUser?.uid ?? 'none';
 }
 
+/// Shows a snack bar with a given message.
 void showSnackBar(BuildContext context, String s) {
   if (!context.mounted) return;
 
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s)));
 }
 
+/// The main entry point of the application.
 class ChronosculptApp extends StatelessWidget {
   const ChronosculptApp({super.key});
 
@@ -52,6 +55,9 @@ class ChronosculptApp extends StatelessWidget {
   }
 }
 
+/// The widget that holds the main 4 widgets of the app.
+/// Contains the currently selected widget as well as
+/// the BottomNavigationBar.
 class MainWidget extends StatefulWidget {
   const MainWidget({super.key});
 
@@ -60,7 +66,6 @@ class MainWidget extends StatefulWidget {
 }
 
 class _MainWidgetState extends State<MainWidget> {
-  static BuildContext? applicationContext;
   var selectedIndex = 0;
   var dataLoaded = false;
 
@@ -69,7 +74,7 @@ class _MainWidgetState extends State<MainWidget> {
     var colorScheme = Theme.of(context).colorScheme;
 
     if (!FirebaseHelper().authenticated()) {
-      return const AuthenticationWidget();
+      return const SplashWidget();
     }
 
     Widget page;
@@ -78,7 +83,7 @@ class _MainWidgetState extends State<MainWidget> {
     Color textColor = Colors.transparent;
     switch (selectedIndex) {
       case 0:
-        page = const LogWidget();
+        page = const LogWidgetWrapper();
         appBarText = "Log";
         appBarColor = colorScheme.secondary;
         textColor = colorScheme.surface;
@@ -106,6 +111,7 @@ class _MainWidgetState extends State<MainWidget> {
         break;
     }
 
+    // Backfills past data for stopwatch and live splitter functionality.
     if (!dataLoaded) {
       PastHabitsWidget.retrieveAndAnalyzeData().catchError(
         (error) => showSnackBar(context, 'Error preloading past data: $error'),
@@ -113,7 +119,6 @@ class _MainWidgetState extends State<MainWidget> {
       dataLoaded = true;
     }
 
-    applicationContext ??= context;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: appBarColor,

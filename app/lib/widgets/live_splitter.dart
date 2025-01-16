@@ -8,6 +8,9 @@ import 'package:chronosculpt/widgets/history.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
+/// Displays a list of entries as a reorderable list
+/// of tiles, enabling the user to create a sequence
+/// of habits to perform in immediate succession.
 class LiveSplitter extends StatefulWidget {
   final List<Entry> entries;
   const LiveSplitter({super.key, required this.entries});
@@ -17,7 +20,7 @@ class LiveSplitter extends StatefulWidget {
 }
 
 class _LiveSplitterState extends State<LiveSplitter> {
-  late List<LiveSplitUnit> units;
+  late List<LiveSplitUnit> _units;
   bool _enableButton = true;
   late Timer _timer;
   DateTime? _startTime;
@@ -25,13 +28,13 @@ class _LiveSplitterState extends State<LiveSplitter> {
   Duration _lastSavedDuration = Duration.zero;
   bool _isRunning = false;
 
-  String toggleText = "Start";
+  String _toggleText = "Start";
 
   @override
   void initState() {
     super.initState();
 
-    units = widget.entries
+    _units = widget.entries
         .map(
           (element) => LiveSplitUnit(
             entry: element,
@@ -43,26 +46,26 @@ class _LiveSplitterState extends State<LiveSplitter> {
         .toList();
   }
 
-  LiveSplitUnit getCurrentUnit() {
+  LiveSplitUnit _getCurrentUnit() {
     // look for a unit in progress
-    for (var unit in units) {
+    for (var unit in _units) {
       if (unit.status == LiveSplitStatus.inProgress) return unit;
     }
 
     // if none in progress, just find the first one that is waiting
-    for (var unit in units) {
+    for (var unit in _units) {
       if (unit.status == LiveSplitStatus.waiting) return unit;
     }
 
-    return units[units.length - 1];
+    return _units[_units.length - 1];
   }
 
   void _start() {
     if (!_isRunning) {
-      toggleText = "Stop";
+      _toggleText = "Stop";
       _startTime ??= DateTime.now().subtract(_elapsed);
 
-      LiveSplitUnit u = getCurrentUnit();
+      LiveSplitUnit u = _getCurrentUnit();
       u.status = LiveSplitStatus.inProgress;
       u.startTime ??= DateTime.now().subtract(u.elapsed);
 
@@ -80,10 +83,10 @@ class _LiveSplitterState extends State<LiveSplitter> {
 
   void _stop() {
     if (_isRunning) {
-      toggleText = "Start";
+      _toggleText = "Start";
       _timer.cancel();
       _startTime = null;
-      getCurrentUnit().startTime = null;
+      _getCurrentUnit().startTime = null;
       setState(() {
         _isRunning = false;
       });
@@ -102,7 +105,7 @@ class _LiveSplitterState extends State<LiveSplitter> {
     if (!_isRunning) return;
 
     // Stop timer
-    var unit = getCurrentUnit();
+    var unit = _getCurrentUnit();
     var tempStartTime = _startTime;
     _elapsed = DateTime.now().difference(tempStartTime!);
     tempStartTime = unit.startTime;
@@ -129,8 +132,8 @@ class _LiveSplitterState extends State<LiveSplitter> {
       setState(() {
         _enableButton = true;
       });
-      if (allUnitsCompleted()) {
-        if (noFailures() && context.mounted) {
+      if (_allUnitsCompleted()) {
+        if (_noFailures() && context.mounted) {
           Navigator.of(context).pop();
         }
       } else {
@@ -139,16 +142,16 @@ class _LiveSplitterState extends State<LiveSplitter> {
     }
   }
 
-  bool allUnitsCompleted() {
-    for (var unit in units) {
+  bool _allUnitsCompleted() {
+    for (var unit in _units) {
       if (unit.status == LiveSplitStatus.waiting ||
           unit.status == LiveSplitStatus.inProgress) return false;
     }
     return true;
   }
 
-  bool noFailures() {
-    for (var unit in units) {
+  bool _noFailures() {
+    for (var unit in _units) {
       if (unit.status == LiveSplitStatus.uploadFailure) return false;
     }
     return true;
@@ -159,7 +162,7 @@ class _LiveSplitterState extends State<LiveSplitter> {
     setState(() {
       _elapsed = _lastSavedDuration;
       _startTime = null;
-      var u = getCurrentUnit();
+      var u = _getCurrentUnit();
       u.elapsed = Duration.zero;
       u.startTime = null;
       u.status = LiveSplitStatus.waiting;
@@ -169,12 +172,12 @@ class _LiveSplitterState extends State<LiveSplitter> {
   void _delete(int i, BuildContext context) {
     if (_isRunning) return;
 
-    if (units[i].status == LiveSplitStatus.inProgress) {
+    if (_units[i].status == LiveSplitStatus.inProgress) {
       _elapsed = _lastSavedDuration;
     }
 
-    units.removeAt(i);
-    if (units.isEmpty || allUnitsCompleted()) {
+    _units.removeAt(i);
+    if (_units.isEmpty || _allUnitsCompleted()) {
       Navigator.of(context).pop();
     }
     setState(() {});
@@ -182,8 +185,8 @@ class _LiveSplitterState extends State<LiveSplitter> {
 
   void _reorder(int oldIndex, int newIndex) {
     try {
-      if (units[oldIndex].status != LiveSplitStatus.waiting ||
-          units[newIndex].status != LiveSplitStatus.waiting) return;
+      if (_units[oldIndex].status != LiveSplitStatus.waiting ||
+          _units[newIndex].status != LiveSplitStatus.waiting) return;
     } catch (e) {
       // Nothing
     }
@@ -192,8 +195,8 @@ class _LiveSplitterState extends State<LiveSplitter> {
       newIndex -= 1;
     }
 
-    var temp = units.removeAt(oldIndex);
-    units.insert(newIndex, temp);
+    var temp = _units.removeAt(oldIndex);
+    _units.insert(newIndex, temp);
     setState(() {});
   }
 
@@ -242,7 +245,7 @@ class _LiveSplitterState extends State<LiveSplitter> {
                 itemBuilder: (context, index) {
                   final isMobile =
                       !kIsWeb && (Platform.isAndroid || Platform.isIOS);
-                  var unit = units[index];
+                  var unit = _units[index];
 
                   if (isMobile) {
                     return ReorderableDelayedDragStartListener(
@@ -277,7 +280,7 @@ class _LiveSplitterState extends State<LiveSplitter> {
                   }
                 },
                 buildDefaultDragHandles: false,
-                itemCount: units.length,
+                itemCount: _units.length,
                 onReorder: _reorder,
               ),
             ),
@@ -297,7 +300,7 @@ class _LiveSplitterState extends State<LiveSplitter> {
                   onPressed: _toggle,
                   style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.secondary),
-                  child: Text(toggleText, style: textStyle),
+                  child: Text(_toggleText, style: textStyle),
                 ),
                 const SizedBox(width: 10),
                 _enableButton
@@ -333,6 +336,7 @@ class _LiveSplitterState extends State<LiveSplitter> {
   }
 }
 
+/// An individual tile used by the Live Splitter class.
 class LiveSplitTile extends StatefulWidget {
   final LiveSplitUnit unit;
   final Function deleter;
@@ -349,13 +353,13 @@ class LiveSplitTile extends StatefulWidget {
 }
 
 class _LiveSplitTileState extends State<LiveSplitTile> {
-  bool hovering = false;
+  bool _hovering = false;
 
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
     Color background =
-        hovering ? colorScheme.surfaceContainerHigh : colorScheme.surface;
+        _hovering ? colorScheme.surfaceContainerHigh : colorScheme.surface;
     final textStyle = TextStyle(
       color: colorScheme.secondary,
       fontSize: 16.0,
@@ -374,7 +378,7 @@ class _LiveSplitTileState extends State<LiveSplitTile> {
         highlightColor: Colors.transparent,
         hoverColor: Colors.transparent,
         onHover: (value) {
-          setState(() => hovering = value);
+          setState(() => _hovering = value);
         },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 120),
@@ -405,7 +409,7 @@ class _LiveSplitTileState extends State<LiveSplitTile> {
                     const SizedBox(width: 6.0),
                     Text(minSplitText, style: textStyle),
                     const SizedBox(width: 8.0),
-                    getStatusWidget(colorScheme),
+                    _getStatusWidget(colorScheme),
                     const SizedBox(width: 4.0),
                     Container(
                       constraints: const BoxConstraints(maxWidth: 32.0),
@@ -424,7 +428,7 @@ class _LiveSplitTileState extends State<LiveSplitTile> {
     );
   }
 
-  Widget getStatusWidget(ColorScheme scheme) {
+  Widget _getStatusWidget(ColorScheme scheme) {
     switch (widget.unit.status) {
       case LiveSplitStatus.waiting:
         return Icon(Icons.bed, color: scheme.secondary);

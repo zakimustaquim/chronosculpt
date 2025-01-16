@@ -2,15 +2,16 @@ import 'package:chronosculpt/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+/// Handles user authentication using Firebase.
 class FirebaseHelper {
-  FirebaseAuth fa = FirebaseAuth.instance;
+  final _fa = FirebaseAuth.instance;
 
   Future<UserCredential?> createUser(
       String email, String pass, BuildContext context) async {
     UserCredential? credential;
     try {
       credential =
-          await fa.createUserWithEmailAndPassword(email: email, password: pass);
+          await _fa.createUserWithEmailAndPassword(email: email, password: pass);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         showSnackBar(context, 'The password provided is too weak.');
@@ -32,7 +33,7 @@ class FirebaseHelper {
     UserCredential? credential;
     try {
       credential =
-          await fa.signInWithEmailAndPassword(email: email, password: pass);
+          await _fa.signInWithEmailAndPassword(email: email, password: pass);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'wrong-password') {
         showSnackBar(context, 'The wrong password was entered.');
@@ -53,7 +54,7 @@ class FirebaseHelper {
     return credential;
   }
 
-  Future<void> signOut() async => await fa.signOut();
+  Future<void> signOut() async => await _fa.signOut();
 
-  bool authenticated() => fa.currentUser != null;
+  bool authenticated() => _fa.currentUser != null;
 }

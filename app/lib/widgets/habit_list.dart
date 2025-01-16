@@ -5,6 +5,8 @@ import 'package:chronosculpt/widgets/dialogs.dart';
 import 'package:chronosculpt/widgets/misc_widgets.dart';
 import 'package:flutter/material.dart';
 
+/// Gets the list of habits from the database and launches the
+/// habits list widget.
 class HabitListWrapper extends StatefulWidget {
   const HabitListWrapper({super.key});
 
@@ -40,6 +42,7 @@ class _HabitListWrapperState extends State<HabitListWrapper> {
   }
 }
 
+/// Displays the habits as a list of cards.
 class HabitListWidget extends StatefulWidget {
   final List<Habit> habits;
   const HabitListWidget({super.key, required this.habits});
@@ -49,10 +52,10 @@ class HabitListWidget extends StatefulWidget {
 }
 
 class _HabitListWidgetState extends State<HabitListWidget> {
-  var controller = TextEditingController();
-  var searchQuery = "";
+  final _controller = TextEditingController();
+  var _searchQuery = "";
 
-  Future<void> onDelete(
+  Future<void> _onDelete(
       {required BuildContext context,
       required Habit habit,
       required List<Habit> habitsList}) async {
@@ -70,7 +73,7 @@ class _HabitListWidgetState extends State<HabitListWidget> {
     }
   }
 
-  Future<void> onEdit({
+  Future<void> _onEdit({
     required BuildContext context,
     required Habit habit,
   }) async {
@@ -101,7 +104,7 @@ class _HabitListWidgetState extends State<HabitListWidget> {
     }
   }
 
-  Future<void> onAdd(BuildContext context, List<Habit> habitsList) async {
+  Future<void> _onAdd(BuildContext context, List<Habit> habitsList) async {
     var userInput = await Dialogs.showEditDialog(
       context: context,
       title: 'Add New Habit',
@@ -137,7 +140,7 @@ class _HabitListWidgetState extends State<HabitListWidget> {
     return Scaffold(
       backgroundColor: colorScheme.surface,
       floatingActionButton: ChronosculptFloatingActionButton(
-        onPressed: () => onAdd(context, widget.habits),
+        onPressed: () => _onAdd(context, widget.habits),
         colorScheme: colorScheme,
         icon: const Icon(Icons.add),
       ),
@@ -151,7 +154,7 @@ class _HabitListWidgetState extends State<HabitListWidget> {
               bottom: 12.0,
             ),
             child: TextField(
-              controller: controller,
+              controller: _controller,
               decoration: const InputDecoration(
                 hintText: 'Search habits',
                 border: OutlineInputBorder(
@@ -168,7 +171,7 @@ class _HabitListWidgetState extends State<HabitListWidget> {
               ),
               onChanged: (value) {
                 setState(() {
-                  searchQuery = value;
+                  _searchQuery = value;
                 });
               },
             ),
@@ -185,13 +188,13 @@ class _HabitListWidgetState extends State<HabitListWidget> {
                         textColor: colorScheme.surface,
                         title: habit.name,
                         comments: habit.comments,
-                        onTap: () => onEdit(context: context, habit: habit),
+                        onTap: () => _onEdit(context: context, habit: habit),
                         show: habit.name
                                 .toLowerCase()
-                                .contains(searchQuery.toLowerCase()) ||
+                                .contains(_searchQuery.toLowerCase()) ||
                             habit.comments
                                 .toLowerCase()
-                                .contains(searchQuery.toLowerCase()),
+                                .contains(_searchQuery.toLowerCase()),
                         topRightWidget: Transform.scale(
                           scale: 1,
                           child: ElevatedButton(
@@ -199,7 +202,7 @@ class _HabitListWidgetState extends State<HabitListWidget> {
                               // fixedSize: Size(24.0, 24.0),
                               shape: const CircleBorder(),
                             ),
-                            onPressed: () => onDelete(
+                            onPressed: () => _onDelete(
                                 context: context,
                                 habit: habit,
                                 habitsList: widget.habits),

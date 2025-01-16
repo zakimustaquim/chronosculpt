@@ -6,6 +6,9 @@ import 'package:chronosculpt/main.dart';
 import 'package:chronosculpt/widgets/history.dart';
 import 'package:flutter/material.dart';
 
+/// Widget that displays a simple timer and is capable
+/// of recording the total time taken to complete
+/// a habit and updating the time in the database.
 class StopwatchWidget extends StatefulWidget {
   final Entry entry;
   const StopwatchWidget({
@@ -24,13 +27,13 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
   bool _isRunning = false;
   bool _enableButton = true;
   bool _showCustomDurationField = false;
-  String toggleText = "Start";
-  var minutesController = TextEditingController();
-  var secondsController = TextEditingController();
+  String _toggleText = "Start";
+  final _minutesController = TextEditingController();
+  final _secondsController = TextEditingController();
 
   void _start() {
     if (!_isRunning) {
-      toggleText = "Stop";
+      _toggleText = "Stop";
       _startTime ??= DateTime.now().subtract(_elapsed);
       _timer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
         setState(() {
@@ -46,7 +49,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
 
   void _stop() {
     if (_isRunning) {
-      toggleText = "Start";
+      _toggleText = "Start";
       _timer.cancel();
       _elapsed = DateTime.now().difference(_startTime!);
       _startTime = null;
@@ -89,7 +92,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
     return "$minutes:$seconds"; */
   }
 
-  Future<void> saveDuration({
+  Future<void> _saveDuration({
     required BuildContext context,
   }) async {
     setState(() {
@@ -103,8 +106,8 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
     int? newSplit;
     if (_showCustomDurationField) {
       try {
-        int minutes = int.parse(minutesController.text);
-        int seconds = int.parse(secondsController.text);
+        int minutes = int.parse(_minutesController.text);
+        int seconds = int.parse(_secondsController.text);
         Duration duration = Duration(minutes: minutes, seconds: seconds);
         newSplit = duration.inMilliseconds;
       } catch (e) {
@@ -132,7 +135,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
     }
   }
 
-  Widget getTextField(
+  Widget _getTextField(
       TextEditingController controller, ColorScheme colorScheme, String hint) {
     return Theme(
       data: Theme.of(context).copyWith(
@@ -165,7 +168,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
     );
   }
 
-  String getMinSplit() {
+  String _getMinSplit() {
     for (var hr in PastHabitsWidget.past30DaysHabits) {
       if (hr.name == widget.entry.habitName) {
         int minSplit = hr.minSplit;
@@ -179,7 +182,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
     return "Unable to retrieve";
   }
 
-  String getAverageSplit() {
+  String _getAverageSplit() {
     for (var hr in PastHabitsWidget.past30DaysHabits) {
       if (hr.name == widget.entry.habitName) {
         double averageSplit = hr.averageSplit;
@@ -217,14 +220,14 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'AS: ${getAverageSplit()}',
+              'AS: ${_getAverageSplit()}',
               style: TextStyle(
                 color: colorScheme.surface,
                 fontSize: 20.0,
               ),
             ),
             Text(
-              'PB: ${getMinSplit()}',
+              'PB: ${_getMinSplit()}',
               style: TextStyle(
                 color: colorScheme.surface,
                 fontSize: 20.0,
@@ -245,7 +248,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
               children: [
                 ElevatedButton(
                   onPressed: _toggle,
-                  child: Text(toggleText, style: textStyle),
+                  child: Text(_toggleText, style: textStyle),
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton(
@@ -262,7 +265,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
             _enableButton
                 ? ElevatedButton(
                     onPressed: () {},
-                    onLongPress: () => saveDuration(context: context),
+                    onLongPress: () => _saveDuration(context: context),
                     child: Text(
                       'Save',
                       style: textStyle,
@@ -291,15 +294,15 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                         SizedBox(
                           height: 40.0,
                           width: 80.0,
-                          child: getTextField(
-                              minutesController, colorScheme, "MM"),
+                          child: _getTextField(
+                              _minutesController, colorScheme, "MM"),
                         ),
                         const SizedBox(width: 16.0),
                         SizedBox(
                           height: 40.0,
                           width: 80.0,
-                          child: getTextField(
-                              secondsController, colorScheme, "SS"),
+                          child: _getTextField(
+                              _secondsController, colorScheme, "SS"),
                         ),
                       ],
                     ),

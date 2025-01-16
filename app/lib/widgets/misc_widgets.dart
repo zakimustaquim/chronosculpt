@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Boilerplate loading screen.
 class LoadingScreen extends StatelessWidget {
   const LoadingScreen({super.key});
 
@@ -9,6 +10,8 @@ class LoadingScreen extends StatelessWidget {
   }
 }
 
+/// Error screen displayed when the database returns
+/// an error.
 class SnapshotErrorScreen extends StatelessWidget {
   final AsyncSnapshot snapshot;
   const SnapshotErrorScreen({super.key, required this.snapshot});
@@ -24,6 +27,8 @@ class SnapshotErrorScreen extends StatelessWidget {
   }
 }
 
+/// Error screen that displays the specific
+/// message that was passed in.
 class ErrorScreen extends StatelessWidget {
   final String message;
   const ErrorScreen({super.key, required this.message});
@@ -39,6 +44,10 @@ class ErrorScreen extends StatelessWidget {
   }
 }
 
+/// Card used in 3 of the 4 main widgets. Has two main
+/// text fields - a title and a description - and supports
+/// onTap and onLongPress arguments as well as an additional
+/// widget in the upper right corner.
 class HabitCard extends StatefulWidget {
   final Color textColor;
   final Color backgroundColor;
@@ -66,7 +75,7 @@ class HabitCard extends StatefulWidget {
 }
 
 class _HabitCardState extends State<HabitCard> {
-  double scale = 1;
+  double _scale = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -79,12 +88,12 @@ class _HabitCardState extends State<HabitCard> {
         highlightColor: Colors.transparent,
         enableFeedback: true,
         onHighlightChanged: (hovering) => setState(
-          () => scale = hovering ? 0.92 : 1,
+          () => _scale = hovering ? 0.92 : 1,
         ),
         onTap: () => widget.onTap(),
         onLongPress: widget.onLongPress,
         child: AnimatedContainer(
-          transform: Matrix4.identity()..scale(scale),
+          transform: Matrix4.identity()..scale(_scale),
           transformAlignment: FractionalOffset.center,
           duration: const Duration(milliseconds: 120),
           decoration: BoxDecoration(
@@ -142,6 +151,7 @@ class _HabitCardState extends State<HabitCard> {
   }
 }
 
+/// Main floating action button used in the app.
 class ChronosculptFloatingActionButton extends FloatingActionButton {
   ChronosculptFloatingActionButton({
     super.key,

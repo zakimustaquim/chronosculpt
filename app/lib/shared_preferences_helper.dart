@@ -1,6 +1,7 @@
 import 'package:chronosculpt/firebase_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Handles Shared Preferences transactions.
 class SharedPreferencesHelper {
   Future<void> forgetIfRequested() async {
     var fh = FirebaseHelper();

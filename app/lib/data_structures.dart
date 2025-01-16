@@ -1,7 +1,12 @@
+/// Abstract class declaring that implementing
+/// members should be able to clone themselves
+/// (i.e. return a new object that is identical)
 abstract class Cloneable {
   Cloneable clone();
 }
 
+/// Responses from the server regarding the habits table 
+/// are mapped onto this class.
 class Habit extends Cloneable {
   int hid;
   String uid;
@@ -61,6 +66,8 @@ class Habit extends Cloneable {
   }
 }
 
+/// Responses from the server regarding the entries table 
+/// are mapped onto this class.
 class Entry extends Cloneable {
   int eid;
   int rid;
@@ -142,6 +149,8 @@ class Entry extends Cloneable {
   }
 }
 
+/// Responses from the server regarding the records table 
+/// are mapped onto this class.
 class Record extends Cloneable {
   int rid;
   String uid;
@@ -211,7 +220,7 @@ class Record extends Cloneable {
   }
 }
 
-// parses a String as returned from the API into a DateTime object
+/// parses a String as returned from the API into a DateTime object
 DateTime parseString(String s) {
   List<String> tokens = s.split(', ')[1].split(' ');
   // Example: 08 Jan 2025 20:57:02 GMT
@@ -229,7 +238,8 @@ DateTime parseString(String s) {
   return date; // keep in utc for now
 }
 
-// The input string should be an abbreviation as in Python's dt toString call
+/// Gets the equivalent month as an int for a given String abbreviation.
+/// The input string should be an abbreviation as in Python's dt toString call.
 int convertStringToDayOfMonth(String s) {
   switch (s) {
     case 'Jan':
@@ -261,6 +271,7 @@ int convertStringToDayOfMonth(String s) {
   }
 }
 
+/// Thrown if the month abbreviation wasn't able to be mapped.
 class MonthNotFoundException implements Exception {
   final String message;
   final String invalidValue;
@@ -274,10 +285,11 @@ class MonthNotFoundException implements Exception {
   String toString() => '$message: $invalidValue';
 }
 
+/// Returns a 
 List<T> deepCopyList<T>(List<T> inputList) {
   return inputList.map((element) {
     if (element is Cloneable) {
-      return (element as Cloneable).clone() as T;
+      return element.clone() as T;
     } else {
       // If elements are not Cloneable, assume they are immutable (like int, String, etc.)
       return element;
@@ -285,6 +297,9 @@ List<T> deepCopyList<T>(List<T> inputList) {
   }).toList();
 }
 
+/// Used by PastHabitsWIdget for calculating statistics
+/// on a given habit. Contains all the occurrences of
+/// a given habit.
 class HabitRetrospective {
   final String name;
   final List<Entry> occurrences;
@@ -333,8 +348,10 @@ class HabitRetrospective {
   String toString() => "$name $occurrences";
 }
 
+/// Holds the status of the tile in the Live Splitter.
 enum LiveSplitStatus { waiting, inProgress, uploading, uploadSuccess, uploadFailure }
 
+/// Used by Live Splitter to manage independent timers.
 class LiveSplitUnit {
   Entry entry;
   DateTime? startTime;
@@ -353,6 +370,9 @@ class LiveSplitUnit {
   });
 }
 
+/// Returns the user-inputted length of a habit. The
+/// length is specified by adding "(X min)" to the
+/// end of the habit name.
 int getLengthOfHabit(String s) {
   if (s.isEmpty) return 0;
   List<String> split = s.split('(');
@@ -366,7 +386,7 @@ int getLengthOfHabit(String s) {
   return guess;
 }
 
-// looks for the first number in s, returns 0 if there are none
+/// Looks for the first number in s, returns 0 if there are none
 int parseProbableString(String s) {
   List<String> tokens = s.split(' ');
   for (String str in tokens) {
@@ -385,6 +405,7 @@ int parseProbableString(String s) {
   return 0;
 }
 
+/// Removes the any right parentheses in s.
 String removeRightParenthesis(String s) {
   if (s.contains(')')) {
     var chars = s.split('');
@@ -398,7 +419,7 @@ String removeRightParenthesis(String s) {
   }
 }
 
-// removes anything in parentheses and trimes
+/// Removes anything in parentheses and trims.
 String cleanName(String name) {
   StringBuffer sb = StringBuffer();
   bool writing = true;
@@ -414,6 +435,9 @@ String cleanName(String name) {
   return sb.toString().trim();
 }
 
+/// Gets the total length of a list of entries.
+/// Used by Interactive Scheduler to display the
+/// total time remaining for a given quadrant.
 int getTimesink(List<Entry> entries) {
   int res = 0;
   for (var entry in entries) {
@@ -422,6 +446,7 @@ int getTimesink(List<Entry> entries) {
   return res;
 }
 
+/// Formats a given duration into HH:MM:SS format.
 String formatSplit(double milliseconds) {
   Duration d = Duration(milliseconds: milliseconds.round());
   String noMilliseconds = d.toString().split('.')[0];
@@ -432,6 +457,7 @@ String formatSplit(double milliseconds) {
   }
 }
 
+/// Formats a date to HH:MM [AM/PM] format.
 String formatDateForPastRecord(DateTime date) {
   bool isPm = (date.hour >= 12);
   if (isPm && date.hour > 12) date = date.subtract(const Duration(hours: 12));
@@ -444,6 +470,7 @@ String formatDateForPastRecord(DateTime date) {
   }
 }
 
+/// Finds the average split associated with a given entry.
 double getAverageSplit(Entry e, List<HabitRetrospective> hrs) {
   for (var hr in hrs) {
     if (hr.name == e.habitName) return hr.averageSplit;
@@ -451,6 +478,7 @@ double getAverageSplit(Entry e, List<HabitRetrospective> hrs) {
   return 0;
 }
 
+/// Finds the average split associated with a given entry.
 int getMinSplit(Entry e, List<HabitRetrospective> hrs) {
   for (var hr in hrs) {
     if (hr.name == e.habitName) return hr.minSplit;

@@ -14,15 +14,7 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-# Configuration
-DB_CONFIG = {
-    'host': os.getenv('DB_HOST'),
-    'port': os.getenv('DB_PORT'),
-    'user': os.getenv('DB_USER'),
-    'password': os.getenv('DB_PASSWORD'),
-    'dbname': os.getenv('DB_NAME')
-}
-
+# Load connection string
 connection_string = os.getenv('NEON_STRING')
 
 # Create connection pool
@@ -108,6 +100,7 @@ def init_db(reset=False):
     cursor.close()
     conn.close()
 
+# Route that returns all the habits for a given user ID
 @app.route('/habits/<user_id>/', methods=['GET'])
 def get_habits_by_user_id(user_id):
     try:
@@ -137,6 +130,7 @@ def get_habits_by_user_id(user_id):
     except Exception as e:
         return jsonify({'error' : str(e)}), 500
 
+# Route that returns all the records for a given user ID
 @app.route('/records/<user_id>/', methods=['GET'])
 def get_all_records(user_id):
     try:
@@ -166,6 +160,8 @@ def get_all_records(user_id):
     except Exception as e:
         return jsonify({'error' : str(e)}), 500
 
+# Gets all the entries associated with a given record ID
+# and returns as a list
 def get_entries_by_rid(rid):
     g.cursor.execute('''
             SELECT e.*, h.name as habit_name
@@ -190,7 +186,8 @@ def get_entries_by_rid(rid):
             ]
     return result
 
-# This function expects a timestamp in UTC.
+# Route that returns all the records for a given user ID after
+# the given timestamp. This function expects a timestamp in UTC.
 @app.route('/records/<user_id>/<timestamp>/', methods=['GET'])
 def get_records_after_timestamp(user_id, timestamp):
     try:
@@ -225,6 +222,7 @@ def get_records_after_timestamp(user_id, timestamp):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Route that updates data on a given record.
 # Expects 4 parameters in JSON body - q1notes, q2notes, q3notes, q4notes
 @app.route('/records/<int:record_id>/', methods=['PUT'])
 def update_record(record_id):
@@ -259,6 +257,7 @@ def update_record(record_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Route that updates data on a given entry.
 # Expects 5 parameters in JSON body - comments, done, quadrant, doneAt, and split
 @app.route('/entries/<int:entry_id>/', methods=['PUT'])
 def update_entry(entry_id):
@@ -297,6 +296,7 @@ def update_entry(entry_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Creates a new record using the user's habits.
 @app.route('/records/<user_id>/', methods=['POST'])
 def create_record(user_id):
     try:
@@ -352,6 +352,7 @@ def create_record(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Route that creates a new row in the habits table.
 # Expects 3 parameters in JSON body - name, comments, and preferredQuadrant
 @app.route('/habits/<user_id>/add/', methods=['POST'])
 def add_habit(user_id):
@@ -382,6 +383,7 @@ def add_habit(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Route that updates information for a given habit.
 # Expects 4 parameters in JSON body - name, comments, preferredQuadrant, and active
 @app.route('/habits/<int:habit_id>/', methods=['PUT'])
 def update_habit(habit_id):
@@ -415,6 +417,7 @@ def update_habit(habit_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Route that "deletes" a given habit.
 @app.route('/habits/<int:habit_id>/', methods=['DELETE'])
 def delete_habit(habit_id):
     try:
@@ -432,98 +435,6 @@ def delete_habit(habit_id):
         return jsonify({'error': 'No habits were found matching the criteria'}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-def insert_test_data():
-    conn = psycopg2.connect(connection_string)
-    cursor = conn.cursor()
-
-    # Habits
-    cursor.execute('''
-        INSERT INTO habits (uid, name, comments, preferredQuadrant)
-        VALUES ('a23', 'Habit 1', 'Example comment for 1', 0);
-    ''')
-    cursor.execute('''
-        INSERT INTO habits (uid, name, comments, preferredQuadrant)
-        VALUES ('a23', 'Habit 2', 'Example comment for 2', 4);
-    ''')
-    cursor.execute('''
-        INSERT INTO habits (uid, name, comments, preferredQuadrant)
-        VALUES ('a22', 'Habit 3', 'Example comment for 3', 3);
-    ''')
-    cursor.execute('''
-        INSERT INTO habits (uid, name, comments, preferredQuadrant)
-        VALUES ('a21', 'Habit 4', 'Example comment for 4', 2);
-    ''')
-
-    date = datetime.today()
-    start_of_day_today = datetime(date.year, date.month, date.day) + timedelta(hours=4)
-    start_of_day_yesterday = datetime(date.year, date.month, date.day) + timedelta(hours=4) - timedelta(days=1)
-    start_of_day_21_days_ago = datetime(date.year, date.month, date.day) + timedelta(hours=4) - timedelta(days=21)
-    start_of_day_29_days_ago = datetime(date.year, date.month, date.day) + timedelta(hours=4) - timedelta(days=29)
-    start_of_day_30_days_ago = datetime(date.year, date.month, date.day) + timedelta(hours=4) - timedelta(days=30)
-    start_of_day_31_days_ago = datetime(date.year, date.month, date.day) + timedelta(hours=4) - timedelta(days=31)
-    start_of_day_60_days_ago = datetime(date.year, date.month, date.day) + timedelta(hours=4) - timedelta(days=60)
-
-    cursor.execute('''
-        SET TIME ZONE 'UTC';
-        INSERT INTO records (uid, date)
-        VALUES ('a23', %s);
-    ''', ([start_of_day_yesterday,]))
-
-    cursor.execute('''
-        SET TIME ZONE 'UTC';
-        INSERT INTO records (uid, date)
-        VALUES ('a23', %s);
-    ''', ([start_of_day_21_days_ago,]))
-
-    cursor.execute('''
-        SET TIME ZONE 'UTC';
-        INSERT INTO records (uid, date)
-        VALUES ('a23', %s);
-    ''', ([start_of_day_29_days_ago,]))
-
-    cursor.execute('''
-        SET TIME ZONE 'UTC';
-        INSERT INTO records (uid, date)
-        VALUES ('a23', %s);
-    ''', ([start_of_day_30_days_ago,]))
-
-    cursor.execute('''
-        SET TIME ZONE 'UTC';
-        INSERT INTO records (uid, date)
-        VALUES ('a23', %s);
-    ''', ([start_of_day_31_days_ago]))
-
-    cursor.execute('''
-        SET TIME ZONE 'UTC';
-        INSERT INTO records (uid, date)
-        VALUES ('a23', %s);
-    ''', ([start_of_day_60_days_ago]))
-
-    cursor.execute('''
-                INSERT INTO entries (rid, hid, comments, quadrant, done)
-                VALUES (1, 1, 1-1, 0, true);
-            ''')
-    
-    cursor.execute('''
-                INSERT INTO entries (rid, hid, comments, quadrant)
-                VALUES (1, 2, 1-1, 0);
-            ''')
-
-    cursor.execute('''
-                INSERT INTO entries (rid, hid, comments, quadrant, split, doneAt)
-                VALUES (2, 1, 1-1, 0, 34000, 1736788152692);
-            ''')
-    
-    cursor.execute('''
-                INSERT INTO entries (rid, hid, comments, quadrant, done)
-                VALUES (2, 2, 1-1, 0, true);
-            ''')
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
 
 if __name__ == '__main__':
     init_db()

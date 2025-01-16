@@ -4,6 +4,8 @@ import 'package:chronosculpt/widgets/misc_widgets.dart';
 import 'package:chronosculpt/data_structures.dart';
 import 'package:flutter/material.dart';
 
+/// Retrieves the past 30 days of data from the
+/// database and launches the main history widget.
 class HistoryWidgetWrapper extends StatefulWidget {
   const HistoryWidgetWrapper({super.key});
 
@@ -29,12 +31,16 @@ class _HistoryWidgetWrapperState extends State<HistoryWidgetWrapper> {
           return const ErrorScreen(message: 'The data was unexpectedly null.');
         }
 
-        return HistoryWidget(records: snapshot.data!,);
+        return HistoryWidget(
+          records: snapshot.data!,
+        );
       },
     );
   }
 }
 
+/// Launches the two main views for displaying
+/// past history data.
 class HistoryWidget extends StatefulWidget {
   final List<Record> records;
   const HistoryWidget({super.key, required this.records});
@@ -45,18 +51,18 @@ class HistoryWidget extends StatefulWidget {
 
 class _HistoryWidgetState extends State<HistoryWidget> {
   final _selectedView = <bool>[true, false];
-  List<Widget> tabs = [];
-  int view = 0;
+  List<Widget> _tabs = [];
+  int _view = 0;
 
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
     for (int i = 0; i < _selectedView.length; i++) {
-      if (_selectedView[i]) view = i;
+      if (_selectedView[i]) _view = i;
     }
 
-    if (tabs.isEmpty) {
-      tabs = [
+    if (_tabs.isEmpty) {
+      _tabs = [
         PastRecordsWidget(records: widget.records),
         PastHabitsWidget(records: widget.records)
       ];
@@ -107,8 +113,8 @@ class _HistoryWidgetState extends State<HistoryWidget> {
           ),
           Expanded(
             child: IndexedStack(
-              index: view,
-              children: tabs,
+              index: _view,
+              children: _tabs,
             ),
           ),
         ],
@@ -117,6 +123,7 @@ class _HistoryWidgetState extends State<HistoryWidget> {
   }
 }
 
+/// Shows a list of all past records.
 class PastRecordsWidget extends StatefulWidget {
   final List<Record> records;
   const PastRecordsWidget({super.key, required this.records});
@@ -197,6 +204,7 @@ class DonePercentage extends StatelessWidget {
   }
 }
 
+/// Displays detailed information at the habit level.
 class PastHabitsWidget extends StatefulWidget {
   static List<HabitRetrospective> past30DaysHabits = [];
   final List<Record> records;
@@ -233,8 +241,8 @@ class PastHabitsWidget extends StatefulWidget {
 }
 
 class _PastHabitsWidgetState extends State<PastHabitsWidget> {
-  var controller = TextEditingController();
-  var searchQuery = "";
+  final _controller = TextEditingController();
+  var _searchQuery = "";
 
   @override
   Widget build(BuildContext context) {
@@ -272,7 +280,7 @@ class _PastHabitsWidgetState extends State<PastHabitsWidget> {
             ),
             child: TextField(
               cursorColor: colorScheme.surface,
-              controller: controller,
+              controller: _controller,
               decoration: InputDecoration(
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
@@ -293,13 +301,13 @@ class _PastHabitsWidgetState extends State<PastHabitsWidget> {
               style: TextStyle(color: colorScheme.surface),
               onSubmitted: (value) {
                 setState(() {
-                  searchQuery = value;
+                  _searchQuery = value;
                 });
               },
               onChanged: (value) {
                 if (value == "") {
                   setState(() {
-                    searchQuery = value;
+                    _searchQuery = value;
                   });
                 }
               },
@@ -326,6 +334,9 @@ class _PastHabitsWidgetState extends State<PastHabitsWidget> {
                 backgroundColor: colorScheme.surface,
                 title: hr.name,
                 comments: '$totalDone out of $totalOccurrences done',
+                show: hr.name.toLowerCase().contains(
+                      _searchQuery.toLowerCase(),
+                    ),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -346,6 +357,9 @@ class _PastHabitsWidgetState extends State<PastHabitsWidget> {
   }
 }
 
+/// Displays all recorded entries for a past record,
+/// including any recorded comments, when they were
+/// done, and the recorded time.
 class PastRecordDisplayWidget extends StatefulWidget {
   final Record record;
   const PastRecordDisplayWidget({super.key, required this.record});
@@ -356,8 +370,8 @@ class PastRecordDisplayWidget extends StatefulWidget {
 }
 
 class _PastRecordDisplayWidgetState extends State<PastRecordDisplayWidget> {
-  var controller = TextEditingController();
-  String searchQuery = "";
+  final _controller = TextEditingController();
+  String _searchQuery = "";
 
   @override
   Widget build(BuildContext context) {
@@ -395,7 +409,7 @@ class _PastRecordDisplayWidgetState extends State<PastRecordDisplayWidget> {
               ),
               child: TextField(
                 cursorColor: colorScheme.surface,
-                controller: controller,
+                controller: _controller,
                 decoration: InputDecoration(
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
@@ -416,7 +430,7 @@ class _PastRecordDisplayWidgetState extends State<PastRecordDisplayWidget> {
                 style: TextStyle(color: colorScheme.surface),
                 onChanged: (value) {
                   setState(() {
-                    searchQuery = value;
+                    _searchQuery = value;
                   });
                 },
               ),
@@ -453,10 +467,10 @@ class _PastRecordDisplayWidgetState extends State<PastRecordDisplayWidget> {
                   onTap: () {},
                   show: entry.habitName
                           .toLowerCase()
-                          .contains(searchQuery.toLowerCase()) ||
+                          .contains(_searchQuery.toLowerCase()) ||
                       entry.comments
                           .toLowerCase()
-                          .contains(searchQuery.toLowerCase()),
+                          .contains(_searchQuery.toLowerCase()),
                   topRightWidget: Padding(
                     padding: const EdgeInsets.only(
                       left: 10.0,
@@ -481,6 +495,8 @@ class _PastRecordDisplayWidgetState extends State<PastRecordDisplayWidget> {
   }
 }
 
+/// Displays detailed information for all occurrences
+/// of a given habit.
 class PastHabitDisplayWidget extends StatefulWidget {
   final HabitRetrospective hr;
   const PastHabitDisplayWidget({super.key, required this.hr});

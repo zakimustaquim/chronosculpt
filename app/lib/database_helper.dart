@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'package:chronosculpt/data_structures.dart';
 import 'package:chronosculpt/config.dart';
 
-/// Class which facilitates database connections.
+/// Class which facilitates network connections to the
+/// backend. Uses the http package to make requests.
 class DatabaseHelper {
-  Map<String, String> headers = {
+  final Map<String, String> _headers = {
     'Content-type': 'application/json',
     'Accept': 'application/json',
   };
@@ -76,7 +77,7 @@ class DatabaseHelper {
     final response = await http.put(
       Uri.parse('$backendPath/records/${r.rid}/'),
       body: json.encode(requestBody),
-      headers: headers,
+      headers: _headers,
     );
     checkResponse(response);
 
@@ -96,7 +97,7 @@ class DatabaseHelper {
     final response = await http.put(
       Uri.parse('$backendPath/entries/${e.eid}/'),
       body: json.encode(requestBody),
-      headers: headers,
+      headers: _headers,
     );
     checkResponse(response);
 
@@ -115,7 +116,7 @@ class DatabaseHelper {
     final response = await http.put(
       Uri.parse('$backendPath/habits/${h.hid}/'),
       body: json.encode(requestBody),
-      headers: headers,
+      headers: _headers,
     );
     checkResponse(response);
 
@@ -146,7 +147,7 @@ class DatabaseHelper {
     final response = await http.post(
       Uri.parse('$backendPath/habits/$uid/add/'),
       body: json.encode(requestBody),
-      headers: headers,
+      headers: _headers,
     );
     checkResponse(response);
 
@@ -161,23 +162,16 @@ class DatabaseHelper {
   }
 
   void checkResponse(http.Response response) {
-    switch (response.statusCode) {
-      case 400:
-        throw DatabaseTransactionException(
-            errorCode: 400, invalidValue: response.body);
-      case 404:
-        throw DatabaseTransactionException(
-            errorCode: 404, invalidValue: response.body);
-      case 406:
-        throw DatabaseTransactionException(
-            errorCode: 406, invalidValue: response.body);
-      case 500:
-        throw DatabaseTransactionException(
-            errorCode: 500, invalidValue: response.body);
-    }
+    if (response.statusCode == 200) return;
+    throw DatabaseTransactionException(
+      errorCode: response.statusCode,
+      invalidValue: response.body,
+    );
   }
 }
 
+/// Exception thrown when a non-200 status code was received
+/// from the backend.
 class DatabaseTransactionException {
   int errorCode;
   String? message;

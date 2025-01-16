@@ -4,9 +4,13 @@ import 'package:chronosculpt/data_structures.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+/// Shared variable between QuadrantRadio and QuadrantDropdown
 int selectedQuadrant = 0;
 
+/// Static class containing various dialogs.
 class Dialogs {
+  /// Shows a dialog with a title and comments box
+  /// and optional quadrant selection.
   static Future<({String? first, String? second, int? preferredQuadrant})?>
       showEditDialog({
     required BuildContext context,
@@ -120,6 +124,7 @@ class Dialogs {
     );
   }
 
+  /// Shows a dialog prompting the user to confirm deletion.
   static Future<bool?> showDeleteConfirmationDialog(
       {required BuildContext context}) async {
     var colorScheme = Theme.of(context).colorScheme;
@@ -193,6 +198,7 @@ class Dialogs {
     );
   }
 
+  /// Shows a dialog with one text box.
   static Future<String?> showSchedulingDialog({
     required BuildContext context,
     String? title,
@@ -280,6 +286,9 @@ class Dialogs {
   }
 }
 
+/// A dropdown menu with 5 options for selecting
+/// the preferred quadrant in showEditDialog().
+/// Used in the mobile app for a more efficient UI.
 class QuadrantDropdown extends StatefulWidget {
   const QuadrantDropdown({super.key});
 
@@ -329,6 +338,9 @@ class _QuadrantDropdownState extends State<QuadrantDropdown> {
   }
 }
 
+/// A radio group with 5 options for selecting
+/// the preferred quadrant in showEditDialog().
+/// Used in the web app.
 class QuadrantRadio extends StatefulWidget {
   final bool isMobile;
   const QuadrantRadio({super.key, this.isMobile = false});

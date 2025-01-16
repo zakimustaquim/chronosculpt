@@ -8,6 +8,9 @@ import 'package:chronosculpt/widgets/misc_widgets.dart';
 import 'package:chronosculpt/widgets/stopwatch.dart';
 import 'package:flutter/material.dart';
 
+/// Wrapper widget which retrieves the current record
+/// from the database and launches the main interactive
+/// scheduler widget.
 class InteractiveSchedulerWrapper extends StatefulWidget {
   const InteractiveSchedulerWrapper({super.key});
 
@@ -18,9 +21,6 @@ class InteractiveSchedulerWrapper extends StatefulWidget {
 
 class _InteractiveSchedulerWrapperState
     extends State<InteractiveSchedulerWrapper> {
-  void stateSetter() {
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +72,9 @@ class _InteractiveSchedulerWrapperState
   }
 }
 
+/// Displays the entries for a given record broken up
+/// into 6 containers depending on their quadrant and
+/// whether they are done or not.
 class InteractiveSchedulerWidget extends StatefulWidget {
   final Record r;
   final Function reloader;
@@ -88,9 +91,9 @@ class InteractiveSchedulerWidget extends StatefulWidget {
 
 class _InteractiveSchedulerWidgetState
     extends State<InteractiveSchedulerWidget> {
-  final ScrollController scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
-  void stateSetter() => setState(() {});
+  void _stateSetter() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +123,7 @@ class _InteractiveSchedulerWidgetState
             stratifiedList[5].length);
 
     return SingleChildScrollView(
-      controller: scrollController,
+      controller: _scrollController,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -132,9 +135,9 @@ class _InteractiveSchedulerWidgetState
                 child: QuadrantContainer(
                   entries: stratifiedList[0],
                   quadrant: 0,
-                  scrollController: scrollController,
+                  scrollController: _scrollController,
                   record: widget.r,
-                  refresher: () => stateSetter(),
+                  refresher: () => _stateSetter(),
                   reloader: () => widget.reloader(),
                 ),
               ),
@@ -149,9 +152,9 @@ class _InteractiveSchedulerWidgetState
                   child: QuadrantContainer(
                     entries: stratifiedList[1],
                     quadrant: 1,
-                    scrollController: scrollController,
+                    scrollController: _scrollController,
                     record: widget.r,
-                    refresher: () => stateSetter(),
+                    refresher: () => _stateSetter(),
                     reloader: () => widget.reloader(),
                   ),
                 ),
@@ -159,9 +162,9 @@ class _InteractiveSchedulerWidgetState
                   child: QuadrantContainer(
                     entries: stratifiedList[2],
                     quadrant: 2,
-                    scrollController: scrollController,
+                    scrollController: _scrollController,
                     record: widget.r,
-                    refresher: () => stateSetter(),
+                    refresher: () => _stateSetter(),
                     reloader: () => widget.reloader(),
                   ),
                 ),
@@ -177,9 +180,9 @@ class _InteractiveSchedulerWidgetState
                   child: QuadrantContainer(
                     entries: stratifiedList[3],
                     quadrant: 3,
-                    scrollController: scrollController,
+                    scrollController: _scrollController,
                     record: widget.r,
-                    refresher: () => stateSetter(),
+                    refresher: () => _stateSetter(),
                     reloader: () => widget.reloader(),
                   ),
                 ),
@@ -187,9 +190,9 @@ class _InteractiveSchedulerWidgetState
                   child: QuadrantContainer(
                     entries: stratifiedList[4],
                     quadrant: 4,
-                    scrollController: scrollController,
+                    scrollController: _scrollController,
                     record: widget.r,
-                    refresher: () => stateSetter(),
+                    refresher: () => _stateSetter(),
                     reloader: () => widget.reloader(),
                   ),
                 ),
@@ -203,10 +206,10 @@ class _InteractiveSchedulerWidgetState
                 child: QuadrantContainer(
                   entries: stratifiedList[5],
                   quadrant: 5,
-                  scrollController: scrollController,
+                  scrollController: _scrollController,
                   donePercentage: donePercentage,
                   record: widget.r,
-                  refresher: () => stateSetter(),
+                  refresher: () => _stateSetter(),
                   reloader: () => widget.reloader(),
                 ),
               ),
@@ -218,6 +221,8 @@ class _InteractiveSchedulerWidgetState
   }
 }
 
+/// Displays all of a given list of entries as well as
+/// facilitating notes retrieval and updating.
 class QuadrantContainer extends StatefulWidget {
   final List<Entry> entries;
   final int quadrant;
@@ -243,9 +248,9 @@ class QuadrantContainer extends StatefulWidget {
 }
 
 class _QuadrantContainerState extends State<QuadrantContainer> {
-  double scale = 1;
+  double _scale = 1;
 
-  Future<void> onUpdateQuadrantNotes(BuildContext context) async {
+  Future<void> _onUpdateQuadrantNotes(BuildContext context) async {
     if (widget.quadrant < 1 || widget.quadrant > 4) return;
 
     String initialNotes = "";
@@ -365,7 +370,7 @@ class _QuadrantContainerState extends State<QuadrantContainer> {
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
         focusColor: Colors.transparent,
-        onTap: () => onUpdateQuadrantNotes(context),
+        onTap: () => _onUpdateQuadrantNotes(context),
         onLongPress: widget.quadrant == 5 || widget.entries.isEmpty
             ? null
             : () {
@@ -381,13 +386,13 @@ class _QuadrantContainerState extends State<QuadrantContainer> {
                 });
               },
         onHighlightChanged: (h) => setState(() {
-          scale = h ? 0.92 : 1;
+          _scale = h ? 0.92 : 1;
         }),
         child: DragTarget<Entry>(
           builder: (BuildContext context, List<dynamic> accepted,
               List<dynamic> rejected) {
             return AnimatedContainer(
-              transform: Matrix4.identity()..scale(scale),
+              transform: Matrix4.identity()..scale(_scale),
               transformAlignment: FractionalOffset.center,
               duration: const Duration(milliseconds: 120),
               decoration: BoxDecoration(
@@ -406,7 +411,7 @@ class _QuadrantContainerState extends State<QuadrantContainer> {
                     child: Text(
                       widget.quadrant == 5
                           ? '${(widget.donePercentage * 100).toStringAsFixed(0)}% done'
-                          : '${getQuadrantLabel(widget.quadrant)}\n${getTimesink(
+                          : '${_getQuadrantLabel(widget.quadrant)}\n${getTimesink(
                               widget.entries,
                             )} min remaining',
                       style: TextStyle(
@@ -458,7 +463,7 @@ class _QuadrantContainerState extends State<QuadrantContainer> {
     );
   }
 
-  String getQuadrantLabel(int i) {
+  String _getQuadrantLabel(int i) {
     switch (i) {
       case 1:
         return "Morning";
@@ -474,6 +479,8 @@ class _QuadrantContainerState extends State<QuadrantContainer> {
   }
 }
 
+/// Minor class used by QuadrantContainer to display an
+/// individual entry.
 class InteractiveSchedulerBrick extends StatelessWidget {
   final String text;
   final bool blank;
