@@ -285,7 +285,7 @@ class MonthNotFoundException implements Exception {
   String toString() => '$message: $invalidValue';
 }
 
-/// Returns a 
+/// Returns a deep copy of a given list.
 List<T> deepCopyList<T>(List<T> inputList) {
   return inputList.map((element) {
     if (element is Cloneable) {
@@ -327,13 +327,13 @@ class HabitRetrospective {
   }
 
   int get minSplit {
-    int min = 9007199254740;
+    int min = -1 >>> 1;
     for (var occurrence in occurrences) {
       if (occurrence.split != null && occurrence.split! < min) {
         min = occurrence.split!;
       }
     }
-    return min;
+    return min == -1 >>> 1 ? 0 : min;
   }
 
   double get donePercentage {
@@ -483,5 +483,5 @@ int getMinSplit(Entry e, List<HabitRetrospective> hrs) {
   for (var hr in hrs) {
     if (hr.name == e.habitName) return hr.minSplit;
   }
-  return 9007199254740;
+  return 0;
 }

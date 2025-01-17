@@ -1,3 +1,4 @@
+import 'package:chronosculpt/database_helper.dart';
 import 'package:chronosculpt/firebase_helper.dart';
 import 'package:chronosculpt/firebase_options.dart';
 import 'package:chronosculpt/shared_preferences_helper.dart';
@@ -15,10 +16,16 @@ import 'package:flutter/material.dart';
 /// and sign out if the user requested it on login.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Wake up server if it's asleep
+  DatabaseHelper().getHabits('none');
+
+  // Initialize authenticated
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await SharedPreferencesHelper().forgetIfRequested();
+
   runApp(const ChronosculptApp());
 }
 

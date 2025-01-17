@@ -410,8 +410,85 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(color: colorScheme.secondary),
                 ),
               ),
+              const SizedBox(height: 32.0),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ForgottenPasswordScreen(),
+                    ),
+                  );
+                },
+                child: Text(
+                  'Forgot Passsord?',
+                  style: TextStyle(color: colorScheme.secondary),
+                ),
+              ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class ForgottenPasswordScreen extends StatefulWidget {
+  const ForgottenPasswordScreen({super.key});
+
+  @override
+  State<ForgottenPasswordScreen> createState() =>
+      _ForgottenPasswordScreenState();
+}
+
+class _ForgottenPasswordScreenState extends State<ForgottenPasswordScreen> {
+  bool _sent = false;
+  final _emailController = TextEditingController();
+
+  Future<void> resetPassword(BuildContext context) async {
+    await FirebaseHelper().resetPassword(_emailController.text, context);
+    setState(() {
+      _sent = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var colorScheme = Theme.of(context).colorScheme;
+
+    return Scaffold(
+      backgroundColor: colorScheme.secondary,
+      body: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 240),
+          child: _sent
+              ? Text(
+                  'The reset link has been sent. Please allow up to 24 hours to receive.',
+                  style: TextStyle(color: colorScheme.secondary),
+                )
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Please enter your email here to reset your password.',
+                      style: TextStyle(color: colorScheme.surface),
+                    ),
+                    const SizedBox(height: 16.0),
+                    ChronosculptTextField(
+                      controller: _emailController,
+                      hintText: "Email",
+                      onSubmit: (_) => resetPassword(context),
+                    ),
+                    const SizedBox(height: 16.0),
+                    ElevatedButton(
+                      onPressed: () => resetPassword(context),
+                      child: Text(
+                        'Submit',
+                        style: TextStyle(color: colorScheme.secondary),
+                      ),
+                    ),
+                  ],
+                ),
         ),
       ),
     );

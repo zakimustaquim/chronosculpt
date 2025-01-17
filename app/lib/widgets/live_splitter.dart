@@ -367,7 +367,7 @@ class _LiveSplitTileState extends State<LiveSplitTile> {
     String averageSplitText = widget.unit.averageSplit == 0
         ? ''
         : formatSplit(widget.unit.averageSplit);
-    String minSplitText = widget.unit.minSplit == 9007199254740
+    String minSplitText = widget.unit.minSplit == 0
         ? ''
         : formatSplit(widget.unit.minSplit * 1.0);
 

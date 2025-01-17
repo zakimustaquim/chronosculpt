@@ -172,14 +172,14 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
     for (var hr in PastHabitsWidget.past30DaysHabits) {
       if (hr.name == widget.entry.habitName) {
         int minSplit = hr.minSplit;
-        if (minSplit == 9007199254740) {
+        if (minSplit == 0) {
           return "N/A";
         } else {
-          return formatSplit(hr.minSplit * 1.0);
+          return formatSplit(minSplit * 1.0);
         }
       }
     }
-    return "Unable to retrieve";
+    return "N/A";
   }
 
   String _getAverageSplit() {
@@ -193,7 +193,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
         }
       }
     }
-    return "Unable to retrieve";
+    return "N/A";
   }
 
   @override
