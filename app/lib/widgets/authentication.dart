@@ -136,7 +136,7 @@ class _LoginSignupButtonsState extends State<LoginSignupButtons> {
           ElevatedButton(
             onPressed: () => _startActivity('Login'),
             child: Text(
-              'Login',
+              'Log In',
               style: TextStyle(color: colorScheme.secondary),
             ),
           ),
@@ -147,13 +147,13 @@ class _LoginSignupButtonsState extends State<LoginSignupButtons> {
 }
 
 /// Text field used in the login/signup forms.
-class ChronosculptTextField extends StatefulWidget {
+class AuthenticationTextField extends StatefulWidget {
   final TextEditingController controller;
   final String hintText;
   final bool? obscure;
   final Function(String)? onSubmit;
 
-  const ChronosculptTextField({
+  const AuthenticationTextField({
     super.key,
     required this.controller,
     required this.hintText,
@@ -162,10 +162,10 @@ class ChronosculptTextField extends StatefulWidget {
   });
 
   @override
-  State<ChronosculptTextField> createState() => ChronosculptTextFieldState();
+  State<AuthenticationTextField> createState() => AuthenticationTextFieldState();
 }
 
-class ChronosculptTextFieldState extends State<ChronosculptTextField> {
+class AuthenticationTextFieldState extends State<AuthenticationTextField> {
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
@@ -259,20 +259,20 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
               const SizedBox(height: 16.0),
-              ChronosculptTextField(
+              AuthenticationTextField(
                 controller: _emailController,
                 hintText: 'Email',
                 onSubmit: (_) => _signUp(context),
               ),
               const SizedBox(height: 12.0),
-              ChronosculptTextField(
+              AuthenticationTextField(
                 controller: _passController,
                 hintText: 'Password',
                 obscure: true,
                 onSubmit: (_) => _signUp(context),
               ),
               const SizedBox(height: 12.0),
-              ChronosculptTextField(
+              AuthenticationTextField(
                 controller: _confPassController,
                 hintText: 'Confirm Password',
                 obscure: true,
@@ -367,13 +367,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 16.0),
-              ChronosculptTextField(
+              AuthenticationTextField(
                 controller: _emailController,
                 hintText: 'Email',
                 onSubmit: (_) => _logIn(context),
               ),
               const SizedBox(height: 12.0),
-              ChronosculptTextField(
+              AuthenticationTextField(
                 controller: _passController,
                 hintText: 'Password',
                 obscure: true,
@@ -445,7 +445,7 @@ class _ForgottenPasswordScreenState extends State<ForgottenPasswordScreen> {
   bool _sent = false;
   final _emailController = TextEditingController();
 
-  Future<void> resetPassword(BuildContext context) async {
+  Future<void> _resetPassword(BuildContext context) async {
     await FirebaseHelper().resetPassword(_emailController.text, context);
     setState(() {
       _sent = true;
@@ -474,14 +474,14 @@ class _ForgottenPasswordScreenState extends State<ForgottenPasswordScreen> {
                       style: TextStyle(color: colorScheme.surface),
                     ),
                     const SizedBox(height: 16.0),
-                    ChronosculptTextField(
+                    AuthenticationTextField(
                       controller: _emailController,
                       hintText: "Email",
-                      onSubmit: (_) => resetPassword(context),
+                      onSubmit: (_) => _resetPassword(context),
                     ),
                     const SizedBox(height: 16.0),
                     ElevatedButton(
-                      onPressed: () => resetPassword(context),
+                      onPressed: () => _resetPassword(context),
                       child: Text(
                         'Submit',
                         style: TextStyle(color: colorScheme.secondary),

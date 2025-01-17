@@ -8,6 +8,7 @@ import 'package:chronosculpt/widgets/history.dart';
 import 'package:chronosculpt/widgets/interactive_scheduler.dart';
 import 'package:chronosculpt/widgets/log.dart';
 import 'package:chronosculpt/widgets/misc_widgets.dart';
+import 'package:chronosculpt/widgets/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Wake up server if it's asleep
-  DatabaseHelper().getHabits('none');
+  try {
+    DatabaseHelper().getHabits('none');
+  } catch (e) {
+    // Do nothing - error is expected
+  }
 
   // Initialize authenticated
   await Firebase.initializeApp(
@@ -136,13 +141,19 @@ class _MainWidgetState extends State<MainWidget> {
         ),
         actions: [
           ElevatedButton(
-            onPressed: () async {
-              await FirebaseHelper().signOut();
-              setState(() {});
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyProfileScreen(
+                    refresher: () => setState(() {}),
+                  ),
+                ),
+              );
             },
             style: ElevatedButton.styleFrom(backgroundColor: textColor),
             child: Text(
-              'Sign Out',
+              'My Profile',
               style: TextStyle(color: appBarColor),
             ),
           ),

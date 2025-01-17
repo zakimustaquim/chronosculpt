@@ -11,7 +11,9 @@ class FirebaseHelper {
     UserCredential? credential;
     try {
       credential = await _fa.createUserWithEmailAndPassword(
-          email: email, password: pass);
+        email: email,
+        password: pass,
+      );
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, _mapFirebaseAuthException(e));
     } catch (e) {
@@ -26,6 +28,8 @@ class FirebaseHelper {
         return 'The password provided is too weak.';
       case 'invalid-email':
         return 'Please enter a valid email.';
+      case 'invalid-new-email':
+        return 'Please enter a valid email.';
       case 'email-already-in-use':
         return 'An account already exists for that email.';
       case 'wrong-password':
@@ -35,7 +39,7 @@ class FirebaseHelper {
       case 'missing-password':
         return "Please enter a password.";
       case 'invalid-credential':
-        return "The credentials could not be authenticated.";
+        return "The credentials could not be authenticated. Have you verified your email?";
       case 'user-mismatch':
         return 'The credentials could not be authenticated.';
       default:
@@ -71,12 +75,18 @@ class FirebaseHelper {
     }
   }
 
-  Future<void> updateCurrentUserEmail(String email, String password, BuildContext context) async {
+  Future<void> updateCurrentUserEmail(
+      String email, String password, BuildContext context) async {
     try {
       var currentUser = _fa.currentUser;
       if (currentUser == null) return;
-      currentUser.reauthenticateWithCredential(EmailAuthProvider.credential(email: currentUser.email!, password: password));
-      currentUser.verifyBeforeUpdateEmail('email');
+
+      await currentUser.reauthenticateWithCredential(EmailAuthProvider.credential(
+          email: currentUser.email!, password: password));
+      await currentUser.verifyBeforeUpdateEmail(email);
+
+      showSnackBar(context,
+          'Email successfully updated. Please verify your email before your next sign-in.');
     } on FirebaseAuthException catch (fae) {
       showSnackBar(context, _mapFirebaseAuthException(fae));
     } catch (e) {
@@ -84,12 +94,17 @@ class FirebaseHelper {
     }
   }
 
-  Future<void> updateCurrentUserPassword(String oldPassword, String newPassword, BuildContext context) async {
+  Future<void> updateCurrentUserPassword(
+      String oldPassword, String newPassword, BuildContext context) async {
     try {
       var currentUser = _fa.currentUser;
       if (currentUser == null) return;
-      currentUser.reauthenticateWithCredential(EmailAuthProvider.credential(email: currentUser.email!, password: oldPassword));
-      currentUser.updatePassword(newPassword);
+
+      await currentUser.reauthenticateWithCredential(EmailAuthProvider.credential(
+          email: currentUser.email!, password: oldPassword));
+      await currentUser.updatePassword(newPassword);
+
+      showSnackBar(context, 'Password successfully updated.');
     } on FirebaseAuthException catch (fae) {
       showSnackBar(context, _mapFirebaseAuthException(fae));
     } catch (e) {

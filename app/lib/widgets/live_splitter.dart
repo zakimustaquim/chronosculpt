@@ -145,7 +145,9 @@ class _LiveSplitterState extends State<LiveSplitter> {
   bool _allUnitsCompleted() {
     for (var unit in _units) {
       if (unit.status == LiveSplitStatus.waiting ||
-          unit.status == LiveSplitStatus.inProgress) return false;
+          unit.status == LiveSplitStatus.inProgress) {
+        return false;
+      }
     }
     return true;
   }
@@ -186,7 +188,9 @@ class _LiveSplitterState extends State<LiveSplitter> {
   void _reorder(int oldIndex, int newIndex) {
     try {
       if (_units[oldIndex].status != LiveSplitStatus.waiting ||
-          _units[newIndex].status != LiveSplitStatus.waiting) return;
+          _units[newIndex].status != LiveSplitStatus.waiting) {
+        return;
+      }
     } catch (e) {
       // Nothing
     }
