@@ -24,7 +24,7 @@ class _SplashWidgetState extends State<SplashWidget> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             LogoDisplay(),
-            SizedBox(height: 72.0),
+            SizedBox(height: 36.0),
             LoginSignupButtons(),
           ],
         ),
@@ -162,7 +162,8 @@ class AuthenticationTextField extends StatefulWidget {
   });
 
   @override
-  State<AuthenticationTextField> createState() => AuthenticationTextFieldState();
+  State<AuthenticationTextField> createState() =>
+      AuthenticationTextFieldState();
 }
 
 class AuthenticationTextFieldState extends State<AuthenticationTextField> {
@@ -421,7 +422,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   );
                 },
                 child: Text(
-                  'Forgot Passsord?',
+                  'Forgot Password?',
                   style: TextStyle(color: colorScheme.secondary),
                 ),
               ),
@@ -462,9 +463,22 @@ class _ForgottenPasswordScreenState extends State<ForgottenPasswordScreen> {
         child: Container(
           constraints: const BoxConstraints(maxWidth: 240),
           child: _sent
-              ? Text(
-                  'The reset link has been sent. Please allow up to 24 hours to receive.',
-                  style: TextStyle(color: colorScheme.secondary),
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'If there is an email associated with that account, the reset link has been sent. Please check your inbox.',
+                      style: TextStyle(color: colorScheme.surface),
+                    ),
+                    const SizedBox(height: 16.0),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text(
+                        'Return to Login',
+                        style: TextStyle(color: colorScheme.secondary),
+                      ),
+                    ),
+                  ],
                 )
               : Column(
                   mainAxisAlignment: MainAxisAlignment.center,

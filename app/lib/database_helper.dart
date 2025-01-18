@@ -161,6 +161,13 @@ class DatabaseHelper {
     checkResponse(response);
   }
 
+  // Temporary workaround while I look for a different database service.
+  Future<void> wakeUpDatabase() async {
+    await http.get(Uri.parse('$backendPath/habits/wakeup'));
+    await http.get(Uri.parse('$backendPath/habits/wakeup'));
+    await http.get(Uri.parse('$backendPath/habits/wakeup'));
+  }
+
   void checkResponse(http.Response response) {
     if (response.statusCode == 200) return;
     throw DatabaseTransactionException(

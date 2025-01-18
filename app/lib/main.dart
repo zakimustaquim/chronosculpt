@@ -19,13 +19,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Wake up server if it's asleep
-  try {
-    DatabaseHelper().getHabits('none');
-  } catch (e) {
-    // Do nothing - error is expected
-  }
+  DatabaseHelper().wakeUpDatabase();
 
-  // Initialize authenticated
+  // Initialize authentication
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

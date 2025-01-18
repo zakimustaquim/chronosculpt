@@ -1,11 +1,11 @@
 {
-    "name": "chronosculpt",
-    "short_name": "chronosculpt",
+    "name": "Chronosculpt",
+    "short_name": "Chronosculpt",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Chronosculpt Web App",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
