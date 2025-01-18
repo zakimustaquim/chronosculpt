@@ -1,6 +1,5 @@
 import 'package:chronosculpt/main.dart';
 import 'package:chronosculpt/shared_preferences_helper.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:chronosculpt/firebase_helper.dart';
 
@@ -45,6 +44,11 @@ class LogoDisplay extends StatefulWidget {
 
 class _LogoDisplayState extends State<LogoDisplay> {
   bool _visible = false;
+
+  String _getLogoLocation() {
+    return 'assets/images/logo.png';
+  }
+
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
@@ -63,7 +67,7 @@ class _LogoDisplayState extends State<LogoDisplay> {
       child: Column(
         children: [
           // Firebase hosting nests the image in another subdirectory
-          Image.asset(kIsWeb ? 'assets/images/logo.png' : 'images/logo.png', scale: 5),
+          Image.asset(_getLogoLocation(), scale: 5),
           Text(
             'Chronosculpt',
             style: TextStyle(
@@ -179,6 +183,7 @@ class AuthenticationTextFieldState extends State<AuthenticationTextField> {
         ),
       ),
       child: TextField(
+        autocorrect: false,
         onSubmitted: widget.onSubmit,
         obscureText: widget.obscure == null ? false : true,
         cursorColor: colorScheme.surface,
@@ -449,10 +454,14 @@ class _ForgottenPasswordScreenState extends State<ForgottenPasswordScreen> {
   final _emailController = TextEditingController();
 
   Future<void> _resetPassword(BuildContext context) async {
-    await FirebaseHelper().resetPassword(_emailController.text, context);
-    setState(() {
-      _sent = true;
-    });
+    var reset =
+        await FirebaseHelper().resetPassword(_emailController.text, context);
+
+    if (reset) {
+      setState(() {
+        _sent = true;
+      });
+    }
   }
 
   @override

@@ -65,14 +65,16 @@ class FirebaseHelper {
 
   bool authenticated() => _fa.currentUser != null;
 
-  Future<void> resetPassword(String email, BuildContext context) async {
+  Future<bool> resetPassword(String email, BuildContext context) async {
     try {
       await _fa.sendPasswordResetEmail(email: email);
+      return true;
     } on FirebaseAuthException catch (fae) {
       showSnackBar(context, _mapFirebaseAuthException(fae));
     } catch (e) {
       showSnackBar(context, 'Unknown error: $e');
     }
+    return false;
   }
 
   Future<void> updateCurrentUserEmail(
