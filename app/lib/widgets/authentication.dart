@@ -1,5 +1,6 @@
 import 'package:chronosculpt/main.dart';
 import 'package:chronosculpt/shared_preferences_helper.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:chronosculpt/firebase_helper.dart';
 
@@ -61,7 +62,8 @@ class _LogoDisplayState extends State<LogoDisplay> {
       curve: Curves.easeIn,
       child: Column(
         children: [
-          Image.asset('images/logo.png', scale: 5),
+          // Firebase hosting nests the image in another subdirectory
+          Image.asset(kIsWeb ? 'assets/images/logo.png' : 'images/logo.png', scale: 5),
           Text(
             'Chronosculpt',
             style: TextStyle(
