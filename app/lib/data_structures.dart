@@ -182,7 +182,7 @@ class Record extends Cloneable {
     return Record(
       rid: record['rid'],
       uid: record['uid'],
-      date: parseString(record['date']),
+      date: DateTime.fromMillisecondsSinceEpoch(record['date']),
       q1notes: record['q1notes'],
       q2notes: record['q2notes'],
       q3notes: record['q3notes'],

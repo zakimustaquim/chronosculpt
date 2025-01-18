@@ -74,7 +74,7 @@ def init_db(reset=False):
         CREATE TABLE IF NOT EXISTS records (
             rid SERIAL PRIMARY KEY,
             uid TEXT NOT NULL,
-            date TIMESTAMP DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'UTC'),
+            date BIGINT,
             q1notes TEXT NOT NULL DEFAULT '',
             q2notes TEXT NOT NULL DEFAULT '',
             q3notes TEXT NOT NULL DEFAULT '',
@@ -187,18 +187,16 @@ def get_entries_by_rid(rid):
     return result
 
 # Route that returns all the records for a given user ID after
-# the given timestamp. This function expects a timestamp in UTC.
+# the given timestamp. This function expects a timestamp in UTC
+# as milliseconds since epoch.
 @app.route('/records/<user_id>/<timestamp>/', methods=['GET'])
 def get_records_after_timestamp(user_id, timestamp):
     try:
-        timestamp = int(timestamp) 
-        dt = datetime.fromtimestamp(timestamp / 1000.0)
-
         g.cursor.execute('''
             SELECT *
             FROM records
-            WHERE uid = %s AND date >= %s AT TIME ZONE 'UTC'
-        ''', (user_id, dt,))
+            WHERE uid = %s AND date >= %s
+        ''', (user_id, timestamp,))
         
         records = g.cursor.fetchall()
 
@@ -297,12 +295,9 @@ def update_entry(entry_id):
         return jsonify({'error': str(e)}), 500
 
 # Creates a new record using the user's habits.
-@app.route('/records/<user_id>/', methods=['POST'])
-def create_record(user_id):
+@app.route('/records/<user_id>/<timestamp>/', methods=['POST'])
+def create_record(user_id, timestamp):
     try:
-        date = datetime.today()
-        start_of_day = datetime(date.year, date.month, date.day) + timedelta(hours=4)
-
         habits_response, status_code = get_habits_by_user_id(user_id)
         habits = habits_response.get_json()['habits']
 
@@ -314,19 +309,18 @@ def create_record(user_id):
         g.cursor.execute('''
             SELECT rid
             FROM records
-            WHERE uid = %s AND date >= %s AT TIME ZONE 'UTC'
-        ''', (user_id, start_of_day))
+            WHERE uid = %s AND date >= %s
+        ''', (user_id, timestamp,))
         current_records = g.cursor.fetchall()
         if len(current_records) != 0:
             return jsonify({'error' : 'The user already has a record for today.'}), 400
 
         # insert row into records table
         g.cursor.execute('''
-            SET TIME ZONE 'UTC';
             INSERT INTO records (uid, date)
             VALUES (%s, %s)
             RETURNING *;
-        ''', (user_id, start_of_day))
+        ''', (user_id, timestamp,))
         record = g.cursor.fetchone()
         record_id = record[0]
         

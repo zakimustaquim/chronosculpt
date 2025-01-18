@@ -21,7 +21,6 @@ class InteractiveSchedulerWrapper extends StatefulWidget {
 
 class _InteractiveSchedulerWrapperState
     extends State<InteractiveSchedulerWrapper> {
-
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
@@ -350,11 +349,18 @@ class _QuadrantContainerState extends State<QuadrantContainer> {
             }
           },
           data: entry,
-          feedback:
-              InteractiveSchedulerBrick(text: entry.habitName, blank: false),
-          childWhenDragging:
-              InteractiveSchedulerBrick(text: entry.habitName, blank: true),
-          child: InteractiveSchedulerBrick(text: entry.habitName, blank: false),
+          feedback: InteractiveSchedulerBrick(
+            text: cleanName(entry.habitName),
+            blank: false,
+          ),
+          childWhenDragging: InteractiveSchedulerBrick(
+            text: cleanName(entry.habitName),
+            blank: true,
+          ),
+          child: InteractiveSchedulerBrick(
+            text: cleanName(entry.habitName),
+            blank: false,
+          ),
         ),
       );
     }).toList();

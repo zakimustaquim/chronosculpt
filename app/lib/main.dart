@@ -136,21 +136,24 @@ class _MainWidgetState extends State<MainWidget> {
           style: TextStyle(color: textColor),
         ),
         actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MyProfileScreen(
-                    refresher: () => setState(() {}),
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyProfileScreen(
+                      refresher: () => setState(() {}),
+                    ),
                   ),
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: textColor),
-            child: Text(
-              'My Profile',
-              style: TextStyle(color: appBarColor),
+                );
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: textColor),
+              child: Text(
+                'My Profile',
+                style: TextStyle(color: appBarColor),
+              ),
             ),
           ),
         ],

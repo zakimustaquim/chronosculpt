@@ -125,7 +125,13 @@ class DatabaseHelper {
   }
 
   Future<Record> createRecordForCurrentDay(String uid) async {
-    final response = await http.post(Uri.parse('$backendPath/records/$uid/'));
+    final DateTime date = DateTime.now();
+    var startOfDay =
+        DateTime(date.year, date.month, date.day).add(const Duration(hours: 4));
+    if (date.hour < 4) startOfDay = startOfDay.subtract(const Duration(days: 1));
+    final timestamp = startOfDay.millisecondsSinceEpoch;
+
+    final response = await http.post(Uri.parse('$backendPath/records/$uid/$timestamp/'));
     checkResponse(response);
 
     final Map<String, dynamic> data = json.decode(response.body);
@@ -163,9 +169,10 @@ class DatabaseHelper {
 
   // Temporary workaround while I look for a different database service.
   Future<void> wakeUpDatabase() async {
-    await http.get(Uri.parse('$backendPath/habits/wakeup'));
-    await http.get(Uri.parse('$backendPath/habits/wakeup'));
-    await http.get(Uri.parse('$backendPath/habits/wakeup'));
+    for (int i = 0; i < 5; i++) {
+      final response = await http.get(Uri.parse('$backendPath/habits/wakeup'));
+      if (response.statusCode == 200) break;
+    }
   }
 
   void checkResponse(http.Response response) {
