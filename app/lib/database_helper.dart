@@ -63,6 +63,7 @@ class DatabaseHelper {
       recordsList.removeWhere((element) =>
           element.date.day == d.day && element.date.month == d.month);
     }
+    recordsList.sort((a, b) => b.date.compareTo(a.date),);
     return recordsList;
   }
 

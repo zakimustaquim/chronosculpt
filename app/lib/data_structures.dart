@@ -5,7 +5,7 @@ abstract class Cloneable {
   Cloneable clone();
 }
 
-/// Responses from the server regarding the habits table 
+/// Responses from the server regarding the habits table
 /// are mapped onto this class.
 class Habit extends Cloneable {
   int hid;
@@ -66,7 +66,7 @@ class Habit extends Cloneable {
   }
 }
 
-/// Responses from the server regarding the entries table 
+/// Responses from the server regarding the entries table
 /// are mapped onto this class.
 class Entry extends Cloneable {
   int eid;
@@ -147,9 +147,17 @@ class Entry extends Cloneable {
     split = e.split;
     quadrant = e.quadrant;
   }
+
+  int getSearchPriority() {
+    if (doneAt == null) {
+      return getLengthOfHabit(habitName);
+    } else {
+      return doneAt!.millisecondsSinceEpoch;
+    }
+  }
 }
 
-/// Responses from the server regarding the records table 
+/// Responses from the server regarding the records table
 /// are mapped onto this class.
 class Record extends Cloneable {
   int rid;
@@ -178,6 +186,7 @@ class Record extends Cloneable {
     for (var entry in entriesList) {
       entries.add(Entry.fromMap(entry));
     }
+    entries.sort((a, b) => a.getSearchPriority() - b.getSearchPriority());
 
     return Record(
       rid: record['rid'],
@@ -349,7 +358,13 @@ class HabitRetrospective {
 }
 
 /// Holds the status of the tile in the Live Splitter.
-enum LiveSplitStatus { waiting, inProgress, uploading, uploadSuccess, uploadFailure }
+enum LiveSplitStatus {
+  waiting,
+  inProgress,
+  uploading,
+  uploadSuccess,
+  uploadFailure
+}
 
 /// Used by Live Splitter to manage independent timers.
 class LiveSplitUnit {
