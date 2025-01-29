@@ -267,11 +267,14 @@ class _LiveSplitterState extends State<LiveSplitter> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
-            child: ElevatedButton(
-              onPressed: _isRunning ? null : () => _shuffle(),
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.secondary),
-              child: Icon(Icons.shuffle, color: colorScheme.surface),
+            child: Tooltip(
+              message: "Shuffle",
+              child: ElevatedButton(
+                onPressed: _isRunning ? null : () => _shuffle(),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.secondary),
+                child: Icon(Icons.shuffle, color: colorScheme.surface),
+              ),
             ),
           ),
         ],
@@ -366,7 +369,7 @@ class _LiveSplitterState extends State<LiveSplitter> {
               style: ElevatedButton.styleFrom(
                   backgroundColor: colorScheme.secondary),
               child: Text(
-                'Reset',
+                'Reset Current',
                 style: textStyle,
               ),
             ),
@@ -395,13 +398,13 @@ class LiveSplitTile extends StatefulWidget {
 }
 
 class _LiveSplitTileState extends State<LiveSplitTile> {
-  bool hovering = false;
+  bool _hovering = false;
 
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
     Color background =
-        hovering ? colorScheme.surfaceContainerHigh : colorScheme.surface;
+        _hovering ? colorScheme.surfaceContainerHigh : colorScheme.surface;
     final textStyle = TextStyle(
       color: colorScheme.secondary,
       fontSize: 16.0,
@@ -422,7 +425,7 @@ class _LiveSplitTileState extends State<LiveSplitTile> {
           highlightColor: Colors.transparent,
           hoverColor: Colors.transparent,
           onHover: (value) {
-            setState(() => hovering = value);
+            setState(() => _hovering = value);
           },
           onTap: () {},
           child: AnimatedContainer(

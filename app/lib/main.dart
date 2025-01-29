@@ -135,14 +135,6 @@ class _MainWidgetState extends State<MainWidget> {
         break;
     }
 
-    // Backfills past data for stopwatch and live splitter functionality.
-    if (!dataLoaded) {
-      PastHabitsWidget.retrieveAndAnalyzeData().catchError(
-        (error) => showSnackBar(context, 'Error preloading past data: $error'),
-      );
-      dataLoaded = true;
-    }
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: appBarColor,
