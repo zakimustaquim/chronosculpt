@@ -49,14 +49,30 @@ class ChronosculptApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var colorScheme = ColorScheme.fromSeed(
+      seedColor: const Color.fromARGB(255, 174, 85, 196),
+      surface: const Color.fromARGB(255, 247, 239, 243),
+    );
+
     return MaterialApp(
       title: 'Chronosculpt',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 174, 85, 196),
-          surface: const Color.fromARGB(255, 247, 239, 243),
-        ),
+        colorScheme: colorScheme,
         useMaterial3: true,
+        tooltipTheme: TooltipThemeData(
+          // will update when tooltip ignoring pointer is implemented
+          verticalOffset: 36.0,
+          exitDuration: const Duration(seconds: 0),
+          textStyle: TextStyle(
+            color: colorScheme.surface,
+            fontSize: 12.5,
+            fontWeight: FontWeight.bold,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
       ),
       home: const MainWidget(),
     );

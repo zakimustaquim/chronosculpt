@@ -212,17 +212,15 @@ class PastHabitsWidget extends StatefulWidget {
 
   static void analyzeData(List<Record> data) {
     // calculate habit statistics
-    Map<String, HabitRetrospective> map = {};
+    Map<int, HabitRetrospective> map = {};
     for (var record in data) {
       for (var entry in record.entries) {
-        String cleanedName = cleanName(entry.habitName);
-        entry.dateOfOccurrence = record.date;
-        if (map.containsKey(cleanedName)) {
-          map[cleanedName]!.occurrences.add(entry);
+        if (map.containsKey(entry.hid)) {
+          map[entry.hid]!.occurrences.add(entry);
         } else {
           HabitRetrospective hr =
-              HabitRetrospective(name: cleanedName, occurrences: [entry]);
-          map[cleanedName] = hr;
+              HabitRetrospective(name: cleanName(entry.habitName), occurrences: [entry]);
+          map[entry.hid] = hr;
         }
       }
     }

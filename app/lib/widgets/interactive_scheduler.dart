@@ -332,34 +332,37 @@ class _QuadrantContainerState extends State<QuadrantContainer> {
             widget.refresher();
           });
         },
-        child: Draggable<Entry>(
-          onDragUpdate: (details) {
-            const double scrollThreshold = 75.0;
-            if (details.globalPosition.dy < scrollThreshold) {
-              // Scroll up
-              widget.scrollController.jumpTo(
-                widget.scrollController.offset - 9.0,
-              );
-            } else if (details.globalPosition.dy >
-                MediaQuery.of(context).size.height - scrollThreshold) {
-              // Scroll down
-              widget.scrollController.jumpTo(
-                widget.scrollController.offset + 9.0,
-              );
-            }
-          },
-          data: entry,
-          feedback: InteractiveSchedulerBrick(
-            text: cleanName(entry.habitName),
-            blank: false,
-          ),
-          childWhenDragging: InteractiveSchedulerBrick(
-            text: cleanName(entry.habitName),
-            blank: true,
-          ),
-          child: InteractiveSchedulerBrick(
-            text: cleanName(entry.habitName),
-            blank: false,
+        child: Tooltip(
+          message: entry.comments,
+          child: Draggable<Entry>(
+            onDragUpdate: (details) {
+              const double scrollThreshold = 75.0;
+              if (details.globalPosition.dy < scrollThreshold) {
+                // Scroll up
+                widget.scrollController.jumpTo(
+                  widget.scrollController.offset - 9.0,
+                );
+              } else if (details.globalPosition.dy >
+                  MediaQuery.of(context).size.height - scrollThreshold) {
+                // Scroll down
+                widget.scrollController.jumpTo(
+                  widget.scrollController.offset + 9.0,
+                );
+              }
+            },
+            data: entry,
+            feedback: InteractiveSchedulerBrick(
+              text: cleanName(entry.habitName),
+              blank: false,
+            ),
+            childWhenDragging: InteractiveSchedulerBrick(
+              text: cleanName(entry.habitName),
+              blank: true,
+            ),
+            child: InteractiveSchedulerBrick(
+              text: cleanName(entry.habitName),
+              blank: false,
+            ),
           ),
         ),
       );

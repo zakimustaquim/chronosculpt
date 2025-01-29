@@ -159,6 +159,32 @@ class _LiveSplitterState extends State<LiveSplitter> {
     return true;
   }
 
+  void _shuffle() {
+    if (_isRunning) return;
+
+    // get uncompleted ones
+    var waitingList = _units
+        .where((element) => element.status == LiveSplitStatus.waiting)
+        .toList();
+    waitingList.shuffle();
+
+    int j = 0;
+    for (int i = _getFirstWaiting(); i < _units.length && i >= 0; i++) {
+      _units[i] = waitingList[j];
+      j++;
+    }
+    setState(() {});
+  }
+
+  int _getFirstWaiting() {
+    for (int i = 0; i < _units.length; i++) {
+      if (_units[i].status == LiveSplitStatus.waiting) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   void _reset() {
     _stop();
     setState(() {
@@ -189,6 +215,7 @@ class _LiveSplitterState extends State<LiveSplitter> {
     try {
       if (_units[oldIndex].status != LiveSplitStatus.waiting ||
           _units[newIndex].status != LiveSplitStatus.waiting) {
+        showSnackBar(context, "Can only reorder waiting habits.");
         return;
       }
     } catch (e) {
@@ -237,6 +264,17 @@ class _LiveSplitterState extends State<LiveSplitter> {
           style: TextStyle(color: colorScheme.secondary),
         ),
         backgroundColor: colorScheme.surface,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: ElevatedButton(
+              onPressed: _isRunning ? null : () => _shuffle(),
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: colorScheme.secondary),
+              child: Icon(Icons.shuffle, color: colorScheme.surface),
+            ),
+          ),
+        ],
       ),
       backgroundColor: colorScheme.surface,
       body: Center(
@@ -253,7 +291,7 @@ class _LiveSplitterState extends State<LiveSplitter> {
 
                   if (isMobile) {
                     return ReorderableDelayedDragStartListener(
-                      key: Key('$index'),
+                      key: Key('${unit.entry.eid}'),
                       index: index,
                       child: IgnorePointer(
                         ignoring: _isRunning ||
@@ -309,8 +347,8 @@ class _LiveSplitterState extends State<LiveSplitter> {
                 const SizedBox(width: 10),
                 _enableButton
                     ? ElevatedButton(
-                        onPressed: () {},
-                        onLongPress: () => _next(context),
+                        onPressed: null,
+                        onLongPress: _isRunning ? () => _next(context) : null,
                         style: ElevatedButton.styleFrom(
                             backgroundColor: colorScheme.secondary),
                         child: Text(
@@ -357,13 +395,13 @@ class LiveSplitTile extends StatefulWidget {
 }
 
 class _LiveSplitTileState extends State<LiveSplitTile> {
-  bool _hovering = false;
+  bool hovering = false;
 
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
     Color background =
-        _hovering ? colorScheme.surfaceContainerHigh : colorScheme.surface;
+        hovering ? colorScheme.surfaceContainerHigh : colorScheme.surface;
     final textStyle = TextStyle(
       color: colorScheme.secondary,
       fontSize: 16.0,
@@ -377,54 +415,58 @@ class _LiveSplitTileState extends State<LiveSplitTile> {
 
     return Padding(
       padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
-      child: InkWell(
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-        hoverColor: Colors.transparent,
-        onHover: (value) {
-          setState(() => _hovering = value);
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 120),
-          decoration: BoxDecoration(
-            color: background,
-            borderRadius: BorderRadius.circular(30),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.5),
-                spreadRadius: 0.3,
-                blurRadius: 0.3,
-              )
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                    child: Text(widget.unit.entry.habitName, style: textStyle)),
-                const SizedBox(width: 8.0),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(averageSplitText, style: textStyle),
-                    const SizedBox(width: 6.0),
-                    Text(minSplitText, style: textStyle),
-                    const SizedBox(width: 8.0),
-                    _getStatusWidget(colorScheme),
-                    const SizedBox(width: 4.0),
-                    Container(
-                      constraints: const BoxConstraints(maxWidth: 32.0),
-                      child: InkWell(
-                        onLongPress: () => widget.deleter(),
-                        child: Icon(Icons.delete, color: colorScheme.secondary),
-                      ),
-                    ),
-                  ],
-                ),
+      child: Tooltip(
+        message: widget.unit.entry.comments,
+        child: InkWell(
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          onHover: (value) {
+            setState(() => hovering = value);
+          },
+          onTap: () {},
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 120),
+            decoration: BoxDecoration(
+              color: background,
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 0.3,
+                  blurRadius: 0.3,
+                )
               ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                      child: Text(widget.unit.entry.habitName, style: textStyle)),
+                  const SizedBox(width: 8.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(averageSplitText, style: textStyle),
+                      const SizedBox(width: 6.0),
+                      Text(minSplitText, style: textStyle),
+                      const SizedBox(width: 8.0),
+                      _getStatusWidget(colorScheme),
+                      const SizedBox(width: 4.0),
+                      Container(
+                        constraints: const BoxConstraints(maxWidth: 32.0),
+                        child: InkWell(
+                          onLongPress: () => widget.deleter(),
+                          child: Icon(Icons.delete, color: colorScheme.secondary),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

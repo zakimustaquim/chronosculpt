@@ -5,12 +5,14 @@ class MyProfileScreen extends StatelessWidget {
   final Function refresher;
   const MyProfileScreen({super.key, required this.refresher});
 
-  Future<void> _changePassword(String oldPassword, String newPassword, BuildContext context) async {
+  Future<void> _changePassword(
+      String oldPassword, String newPassword, BuildContext context) async {
     await FirebaseHelper()
         .updateCurrentUserPassword(oldPassword, newPassword, context);
   }
 
-  Future<void> _changeEmail(String newEmail, String password, BuildContext context) async {
+  Future<void> _changeEmail(
+      String newEmail, String password, BuildContext context) async {
     await FirebaseHelper().updateCurrentUserEmail(newEmail, password, context);
   }
 
@@ -57,7 +59,8 @@ class MyProfileScreen extends StatelessWidget {
                       obscurefield2: true,
                       field1Text: 'New Email',
                       field2Text: 'Password',
-                      onSubmit: (field1, field2) => _changeEmail(field1, field2, context),
+                      onSubmit: (field1, field2) =>
+                          _changeEmail(field1, field2, context),
                     ),
                   ],
                 ),
@@ -96,6 +99,14 @@ class MyProfileScreen extends StatelessWidget {
                     )
                   ],
                 ),
+                const SizedBox(height: 32.0),
+                SelectionArea(
+                  child: Text(
+                    'For support, please contact chronosculptsupp@gmail.com.',
+                    style: style,
+                  ),
+                ),
+                const SizedBox(height: 32.0),
               ],
             ),
           ),
@@ -144,9 +155,9 @@ class TwoFieldsForm extends StatelessWidget {
         const SizedBox(height: 16.0),
         ElevatedButton(
           onPressed: () {
-              onSubmit(field1Controller.text, field2Controller.text);
-              field1Controller.text = "";
-              field2Controller.text = "";
+            onSubmit(field1Controller.text, field2Controller.text);
+            field1Controller.text = "";
+            field2Controller.text = "";
           },
           child: const Text('Submit'),
         ),
