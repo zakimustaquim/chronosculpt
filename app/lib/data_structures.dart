@@ -385,11 +385,17 @@ class LiveSplitUnit {
   });
 }
 
+Map<String, int> habitLengths = {};
 /// Returns the user-inputted length of a habit. The
 /// length is specified by adding "(X min)" to the
 /// end of the habit name.
 int getLengthOfHabit(String s) {
   if (s.isEmpty) return 0;
+
+  if (habitLengths.containsKey(s)) {
+    return habitLengths[s]!;
+  }
+
   List<String> split = s.split('(');
   int guess = 0;
 
@@ -398,6 +404,7 @@ int getLengthOfHabit(String s) {
     if (parsed > 0) guess = parsed;
   }
 
+  habitLengths[s] = guess;
   return guess;
 }
 
@@ -434,8 +441,13 @@ String removeRightParenthesis(String s) {
   }
 }
 
+Map<String, String> cleanedNames = {};
 /// Removes anything in parentheses and trims.
 String cleanName(String name) {
+  if (cleanedNames.containsKey(name)) {
+    return cleanedNames[name]!;
+  }
+
   StringBuffer sb = StringBuffer();
   bool writing = true;
   for (var char in name.split('')) {
@@ -447,7 +459,11 @@ String cleanName(String name) {
       sb.write(char);
     }
   }
-  return sb.toString().trim();
+
+  var res = sb.toString().trim();
+
+  cleanedNames[name] = res;
+  return res;
 }
 
 /// Gets the total length of a list of entries.

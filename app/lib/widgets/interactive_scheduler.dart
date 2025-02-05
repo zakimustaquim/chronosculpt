@@ -1,3 +1,4 @@
+import 'package:chronosculpt/config.dart';
 import 'package:chronosculpt/data_structures.dart';
 import 'package:chronosculpt/database_helper.dart';
 import 'package:chronosculpt/main.dart';
@@ -307,33 +308,33 @@ class _QuadrantContainerState extends State<QuadrantContainer> {
     var colorScheme = Theme.of(context).colorScheme;
 
     List<Widget> widgetList = widget.entries.map((entry) {
-      return InkWell(
-        enableFeedback: true,
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-        onTap: () async {
-          var temp = entry.clone();
-          temp.done = widget.quadrant < 5 ? true : false;
-          temp.doneAt = widget.quadrant < 5 ? DateTime.now() : null;
-          try {
-            await DatabaseHelper().updateEntry(temp);
-            entry.updateFrom(temp);
-            widget.refresher();
-          } catch (e) {
-            showSnackBar(context, 'Error updating entry: $e');
-          }
-        },
-        onLongPress: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => StopwatchWidget(entry: entry),
-              )).then((_) {
-            widget.refresher();
-          });
-        },
-        child: Tooltip(
-          message: entry.comments,
+      return Tooltip(
+        message: isMobile ? "" : entry.comments,
+        child: InkWell(
+          enableFeedback: true,
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          onTap: () async {
+            var temp = entry.clone();
+            temp.done = widget.quadrant < 5 ? true : false;
+            temp.doneAt = widget.quadrant < 5 ? DateTime.now() : null;
+            try {
+              await DatabaseHelper().updateEntry(temp);
+              entry.updateFrom(temp);
+              widget.refresher();
+            } catch (e) {
+              showSnackBar(context, 'Error updating entry: $e');
+            }
+          },
+          onLongPress: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => StopwatchWidget(entry: entry),
+                )).then((_) {
+              widget.refresher();
+            });
+          },
           child: Draggable<Entry>(
             onDragUpdate: (details) {
               const double scrollThreshold = 75.0;

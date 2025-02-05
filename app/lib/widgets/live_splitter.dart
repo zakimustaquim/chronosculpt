@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:chronosculpt/config.dart';
 import 'package:chronosculpt/data_structures.dart';
 import 'package:chronosculpt/database_helper.dart';
 import 'package:chronosculpt/main.dart';
@@ -419,7 +420,7 @@ class _LiveSplitTileState extends State<LiveSplitTile> {
     return Padding(
       padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
       child: Tooltip(
-        message: widget.unit.entry.comments,
+        message: isMobile ? "" : widget.unit.entry.comments,
         child: InkWell(
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
