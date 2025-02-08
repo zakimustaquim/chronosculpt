@@ -14,9 +14,9 @@ The frontend was built using Flutter, a cross-platform application development f
 
 ### Defining Habits
 <img width="259" src="https://github.com/user-attachments/assets/67e8cfb4-715b-49bb-a547-7db4640ba7fc" />
-<img width="259" src="https://github.com/user-attachments/assets/d916024b-7a03-4eec-b869-845c105d5066" />
+<img width="259" src="https://github.com/user-attachments/assets/ce66097e-e687-4231-8a89-0db214ecca93" />
 
-Habits can be defined with a name, comments, and optionally a preferred quadrant for the interactive scheduler widget.
+Habits can be defined with a name, comments, length (in minutes), and optionally a preferred quadrant for the interactive scheduler widget.
 
 ### Initializing Records
 <img width="259" src="https://github.com/user-attachments/assets/a1de114e-2324-488d-9a24-89d49e86a4e5" />
