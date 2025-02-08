@@ -311,11 +311,13 @@ List<T> deepCopyList<T>(List<T> inputList) {
 /// a given habit.
 class HabitRetrospective {
   final String name;
+  final int hid;
   final List<Entry> occurrences;
 
   HabitRetrospective({
     required this.name,
     required this.occurrences,
+    required this.hid,
   });
 
   double get averageSplit {
@@ -383,6 +385,8 @@ class LiveSplitUnit {
     required this.minSplit,
     this.status = LiveSplitStatus.waiting,
   });
+
+  String get name => cleanName(entry.habitName);
 }
 
 Map<String, int> habitLengths = {};
@@ -502,17 +506,17 @@ String formatDateForPastRecord(DateTime date) {
 }
 
 /// Finds the average split associated with a given entry.
-double getAverageSplit(Entry e, List<HabitRetrospective> hrs) {
+double getAverageSplit(int hid, List<HabitRetrospective> hrs) {
   for (var hr in hrs) {
-    if (hr.name == e.habitName) return hr.averageSplit;
+    if (hr.hid == hid) return hr.averageSplit;
   }
   return 0;
 }
 
 /// Finds the average split associated with a given entry.
-int getMinSplit(Entry e, List<HabitRetrospective> hrs) {
+int getMinSplit(int hid, List<HabitRetrospective> hrs) {
   for (var hr in hrs) {
-    if (hr.name == e.habitName) return hr.minSplit;
+    if (hr.hid == hid) return hr.minSplit;
   }
   return 0;
 }

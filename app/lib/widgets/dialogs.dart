@@ -204,7 +204,8 @@ class Dialogs {
     String? title,
     required List<Entry> entries,
     required String initialValue,
-    required int? quadrant,
+    required String dialogTitle,
+    // required int? quadrant,
   }) async {
     final TextEditingController textController =
         TextEditingController(text: initialValue);
@@ -238,9 +239,11 @@ class Dialogs {
           content: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                quadrant == -1 ? '' : 'Notes for Quadrant $quadrant',
-                style: const TextStyle(fontSize: 16),
+              Center(
+                child: Text(
+                  dialogTitle,
+                  style: const TextStyle(fontSize: 16),
+                ),
               ),
               (kIsWeb ? habitInfo : const SizedBox()),
               const SizedBox(

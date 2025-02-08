@@ -39,9 +39,14 @@ class _LiveSplitterState extends State<LiveSplitter> {
         .map(
           (element) => LiveSplitUnit(
             entry: element,
-            averageSplit:
-                getAverageSplit(element, PastHabitsWidget.past30DaysHabits),
-            minSplit: getMinSplit(element, PastHabitsWidget.past30DaysHabits),
+            averageSplit: getAverageSplit(
+              element.hid,
+              PastHabitsWidget.past30DaysHabits,
+            ),
+            minSplit: getMinSplit(
+              element.hid,
+              PastHabitsWidget.past30DaysHabits,
+            ),
           ),
         )
         .toList();
@@ -406,10 +411,16 @@ class _LiveSplitTileState extends State<LiveSplitTile> {
     var colorScheme = Theme.of(context).colorScheme;
     Color background =
         _hovering ? colorScheme.surfaceContainerHigh : colorScheme.surface;
+
     final textStyle = TextStyle(
       color: colorScheme.secondary,
       fontSize: 16.0,
     );
+    final labelStyle = TextStyle(
+      color: colorScheme.secondary,
+      fontSize: 11.0,
+    );
+
     String averageSplitText = widget.unit.averageSplit == 0
         ? ''
         : formatSplit(widget.unit.averageSplit);
@@ -448,15 +459,32 @@ class _LiveSplitTileState extends State<LiveSplitTile> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Expanded(
-                      child: Text(widget.unit.entry.habitName, style: textStyle)),
+                    child: Text(widget.unit.name, style: textStyle),
+                  ),
                   const SizedBox(width: 8.0),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(averageSplitText, style: textStyle),
-                      const SizedBox(width: 6.0),
-                      Text(minSplitText, style: textStyle),
+                      averageSplitText.isEmpty
+                          ? const SizedBox()
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(averageSplitText, style: textStyle),
+                                Text('AS', style: labelStyle),
+                              ],
+                            ),
+                      const SizedBox(width: 12.0),
+                      minSplitText.isEmpty
+                          ? const SizedBox()
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(minSplitText, style: textStyle),
+                                Text('PB', style: labelStyle),
+                              ],
+                            ),
                       const SizedBox(width: 8.0),
                       _getStatusWidget(colorScheme),
                       const SizedBox(width: 4.0),
@@ -464,7 +492,8 @@ class _LiveSplitTileState extends State<LiveSplitTile> {
                         constraints: const BoxConstraints(maxWidth: 32.0),
                         child: InkWell(
                           onLongPress: () => widget.deleter(),
-                          child: Icon(Icons.delete, color: colorScheme.secondary),
+                          child:
+                              Icon(Icons.delete, color: colorScheme.secondary),
                         ),
                       ),
                     ],
@@ -481,7 +510,7 @@ class _LiveSplitTileState extends State<LiveSplitTile> {
   Widget _getStatusWidget(ColorScheme scheme) {
     switch (widget.unit.status) {
       case LiveSplitStatus.waiting:
-        return Icon(Icons.bed, color: scheme.secondary);
+        return Icon(Icons.more_horiz, color: scheme.secondary);
       case LiveSplitStatus.inProgress:
         return Text(
           formatSplit(widget.unit.elapsed.inMilliseconds * 1.0),

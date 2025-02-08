@@ -27,6 +27,9 @@ void main() async {
   );
   await SharedPreferencesHelper().forgetIfRequested();
 
+  // Retrieve and analyze past data
+  if (getCurrentUserUid() != 'none') PastHabitsWidget.retrieveAndAnalyzeData();
+
   runApp(const ChronosculptApp());
 }
 
@@ -158,10 +161,7 @@ class _MainWidgetState extends State<MainWidget> {
                 );
               },
               style: ElevatedButton.styleFrom(backgroundColor: textColor),
-              child: Text(
-                'My Profile',
-                style: TextStyle(color: appBarColor),
-              ),
+              child: Icon(Icons.person, color: appBarColor),
             ),
           ),
         ],

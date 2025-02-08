@@ -215,11 +215,15 @@ class PastHabitsWidget extends StatefulWidget {
     Map<int, HabitRetrospective> map = {};
     for (var record in data) {
       for (var entry in record.entries) {
+        entry.dateOfOccurrence = record.date;
         if (map.containsKey(entry.hid)) {
           map[entry.hid]!.occurrences.add(entry);
         } else {
-          HabitRetrospective hr =
-              HabitRetrospective(name: cleanName(entry.habitName), occurrences: [entry]);
+          HabitRetrospective hr = HabitRetrospective(
+            name: cleanName(entry.habitName),
+            occurrences: [entry],
+            hid: entry.hid,
+          );
           map[entry.hid] = hr;
         }
       }
@@ -230,8 +234,12 @@ class PastHabitsWidget extends StatefulWidget {
   }
 
   static Future<void> retrieveAndAnalyzeData() async {
-    var data = await DatabaseHelper().getPast30Days(getCurrentUserUid());
-    analyzeData(data);
+    try {
+      var data = await DatabaseHelper().getPast30Days(getCurrentUserUid());
+      analyzeData(data);
+    } catch (e) {
+      // showSnackBar(context, e.toString());
+    }
   }
 
   @override
@@ -376,22 +384,19 @@ class _PastRecordDisplayWidgetState extends State<PastRecordDisplayWidget> {
     var colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: colorScheme.secondary,
+        centerTitle: true,
+        title: Text(
+          widget.record.date.toString().split(' ')[0],
+          style: TextStyle(
+            color: colorScheme.surface,
+          ),
+        ),
+      ),
       backgroundColor: colorScheme.secondary,
       body: Column(
         children: [
-          Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 28.0, left: 20.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Icon(Icons.arrow_back_ios_new_outlined),
-                ),
-              ),
-            ],
-          ),
           Padding(
             padding: const EdgeInsets.only(
               top: 12.0,
@@ -507,29 +512,25 @@ class _PastHabitDisplayWidgetState extends State<PastHabitDisplayWidget> {
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
-    String infoString = widget.hr.name;
+    String infoString = '';
     if (widget.hr.averageSplit > 0) {
-      infoString =
-          "$infoString\nAverage Split: ${formatSplit(widget.hr.averageSplit)}";
+      infoString = "Average Split: ${formatSplit(widget.hr.averageSplit)}";
     }
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: colorScheme.secondary,
+        centerTitle: true,
+        title: Text(
+          widget.hr.name,
+          style: TextStyle(
+            color: colorScheme.surface,
+          ),
+        ),
+      ),
       backgroundColor: colorScheme.secondary,
       body: Column(
         children: [
-          Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 28.0, left: 20.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Icon(Icons.arrow_back_ios_new_outlined),
-                ),
-              ),
-            ],
-          ),
           Padding(
             padding: const EdgeInsets.only(top: 12.0, bottom: 8.0),
             child: Text(
@@ -543,6 +544,7 @@ class _PastHabitDisplayWidgetState extends State<PastHabitDisplayWidget> {
               itemCount: widget.hr.occurrences.length,
               itemBuilder: (context, index) {
                 final occurrence = widget.hr.occurrences[index];
+                // TODO
                 String dateString =
                     occurrence.dateOfOccurrence.toString().split(' ')[0];
                 if (occurrence.split != null) {

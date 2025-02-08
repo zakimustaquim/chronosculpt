@@ -123,10 +123,10 @@ class _LogWidgetState extends State<LogWidget> {
   }) async {
     var userInput = await Dialogs.showSchedulingDialog(
       context: context,
-      title: 'Edit Habit Details',
+      title: 'Edit Habit Comments',
       entries: [],
       initialValue: entry.comments,
-      quadrant: -1,
+      dialogTitle: cleanName(entry.habitName),
     );
 
     if (userInput != null) {

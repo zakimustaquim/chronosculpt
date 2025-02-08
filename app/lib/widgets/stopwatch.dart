@@ -170,7 +170,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
 
   String _getMinSplit() {
     for (var hr in PastHabitsWidget.past30DaysHabits) {
-      if (hr.name == widget.entry.habitName) {
+      if (hr.hid == widget.entry.hid) {
         int minSplit = hr.minSplit;
         if (minSplit == 0) {
           return "N/A";
@@ -184,7 +184,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
 
   String _getAverageSplit() {
     for (var hr in PastHabitsWidget.past30DaysHabits) {
-      if (hr.name == widget.entry.habitName) {
+      if (hr.hid == widget.entry.hid) {
         double averageSplit = hr.averageSplit;
         if (averageSplit == 0) {
           return "N/A";
@@ -206,7 +206,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
         title: Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: Text(
-            widget.entry.habitName,
+            cleanName(widget.entry.habitName),
             style: TextStyle(
               color: colorScheme.surface,
             ),
