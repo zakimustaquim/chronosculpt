@@ -121,9 +121,8 @@ class _LogWidgetState extends State<LogWidget> {
     required BuildContext context,
     required Entry entry,
   }) async {
-    var userInput = await Dialogs.showSchedulingDialog(
+    var userInput = await Dialogs.showSingleInputDialog(
       context: context,
-      title: 'Edit Habit Comments',
       entries: [],
       initialValue: entry.comments,
       dialogTitle: entry.habitName,

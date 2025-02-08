@@ -269,10 +269,9 @@ class _QuadrantContainerState extends State<QuadrantContainer> {
         break;
     }
 
-    String? newComments = await Dialogs.showSchedulingDialog(
+    String? newComments = await Dialogs.showSingleInputDialog(
       context: context,
       initialValue: initialNotes,
-      // quadrant: widget.quadrant,
       dialogTitle: 'Notes for Quadrant ${widget.quadrant}',
       entries: widget.entries,
     );

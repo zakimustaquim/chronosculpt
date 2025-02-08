@@ -60,49 +60,67 @@ class Dialogs {
           content: Column(
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.6,
-                    height: MediaQuery.of(context).size.height * 0.08,
-                    child: TextField(
-                      textCapitalization: TextCapitalization.sentences,
-                      style: const TextStyle(fontSize: 12),
-                      controller: textController1,
-                      decoration: const InputDecoration(
-                        hintText: 'Habit Name',
-                        border: OutlineInputBorder(),
+                  Expanded(
+                    flex: 7,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.08,
+                        minHeight: 48,
                       ),
-                      autofocus: true,
-                      maxLines: null,
-                      expands: true,
-                      textAlignVertical: TextAlignVertical.top,
-                      keyboardType: TextInputType.multiline,
+                      child: TextField(
+                        textCapitalization: TextCapitalization.sentences,
+                        style: const TextStyle(fontSize: 12),
+                        controller: textController1,
+                        decoration: InputDecoration(
+                          hintText: 'Habit Name',
+                          border: const OutlineInputBorder(),
+                          isDense: isMobile,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 12),
+                        ),
+                        autofocus: true,
+                        maxLines: 1,
+                        expands: false,
+                        textAlignVertical: TextAlignVertical.center,
+                      ),
                     ),
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.05,
+                    width: MediaQuery.of(context).size.width *
+                        (isMobile ? 0.025 : 0.5),
                   ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.15,
-                    height: MediaQuery.of(context).size.height * 0.08,
-                    child: TextField(
-                      textCapitalization: TextCapitalization.sentences,
-                      style: const TextStyle(fontSize: 12),
-                      controller: textController3,
-                      decoration: const InputDecoration(
-                        hintText: 'Length (mins)',
-                        border: OutlineInputBorder(),
+                  Expanded(
+                    flex: 3,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.08,
+                        minHeight: 48,
                       ),
-                      autofocus: true,
-                      maxLines: null,
-                      expands: true,
-                      textAlignVertical: TextAlignVertical.top,
-                      keyboardType: TextInputType.multiline,
+                      child: TextField(
+                        textCapitalization: TextCapitalization.sentences,
+                        style: const TextStyle(fontSize: 12),
+                        controller: textController3,
+                        decoration: InputDecoration(
+                          hintText: 'Length (mins)',
+                          border: const OutlineInputBorder(),
+                          isDense: isMobile,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 12),
+                        ),
+                        autofocus: true,
+                        maxLines: 1,
+                        expands: false,
+                        textAlignVertical: TextAlignVertical.center,
+                      ),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: isMobile ? 0.0 : 16.0),
+              SizedBox(
+                height: isMobile ? 0.0 : 8.0,
+              ),
               isMobile || !showQuadrantSelection
                   ? const SizedBox()
                   : const Padding(
@@ -241,9 +259,8 @@ class Dialogs {
   }
 
   /// Shows a dialog with one text box.
-  static Future<String?> showSchedulingDialog({
+  static Future<String?> showSingleInputDialog({
     required BuildContext context,
-    String? title,
     required List<Entry> entries,
     required String initialValue,
     required String dialogTitle,
@@ -275,18 +292,12 @@ class Dialogs {
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: Text(
-            title ?? 'Enter Information',
+            dialogTitle,
             style: const TextStyle(fontSize: 18),
           ),
           content: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: Text(
-                  dialogTitle,
-                  style: const TextStyle(fontSize: 16),
-                ),
-              ),
               (kIsWeb ? habitInfo : const SizedBox()),
               const SizedBox(
                 height: 16.0,
