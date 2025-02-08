@@ -544,7 +544,6 @@ class _PastHabitDisplayWidgetState extends State<PastHabitDisplayWidget> {
               itemCount: widget.hr.occurrences.length,
               itemBuilder: (context, index) {
                 final occurrence = widget.hr.occurrences[index];
-                // TODO
                 String dateString =
                     occurrence.dateOfOccurrence.toString().split(' ')[0];
                 if (occurrence.split != null) {
