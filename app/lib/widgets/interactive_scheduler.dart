@@ -354,15 +354,15 @@ class _QuadrantContainerState extends State<QuadrantContainer> {
             },
             data: entry,
             feedback: InteractiveSchedulerBrick(
-              text: cleanName(entry.habitName),
+              text: entry.habitName,
               blank: false,
             ),
             childWhenDragging: InteractiveSchedulerBrick(
-              text: cleanName(entry.habitName),
+              text: entry.habitName,
               blank: true,
             ),
             child: InteractiveSchedulerBrick(
-              text: cleanName(entry.habitName),
+              text: entry.habitName,
               blank: false,
             ),
           ),

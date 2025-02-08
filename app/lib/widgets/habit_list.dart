@@ -189,10 +189,14 @@ class _HabitListWidgetState extends State<HabitListWidget> {
                     itemCount: widget.habits.length,
                     itemBuilder: (context, i) {
                       final habit = widget.habits[i];
+                      final title = habit.length != 0
+                          ? '${habit.name} (${habit.length} min)'
+                          : habit.name;
+
                       return HabitCard(
                         backgroundColor: colorScheme.secondary,
                         textColor: colorScheme.surface,
-                        title: habit.name,
+                        title: title,
                         comments: habit.comments,
                         onTap: () => _onEdit(context: context, habit: habit),
                         show: habit.name

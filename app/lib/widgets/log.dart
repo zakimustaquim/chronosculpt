@@ -50,7 +50,7 @@ class _LogWidgetWrapperState extends State<LogWidgetWrapper> {
 }
 
 /// Runs when the user has not created a record for the
-/// current day. 
+/// current day.
 class NoRecordFoundWidget extends StatelessWidget {
   final Function refresher;
   const NoRecordFoundWidget({super.key, required this.refresher});
@@ -126,7 +126,7 @@ class _LogWidgetState extends State<LogWidget> {
       title: 'Edit Habit Comments',
       entries: [],
       initialValue: entry.comments,
-      dialogTitle: cleanName(entry.habitName),
+      dialogTitle: entry.habitName,
     );
 
     if (userInput != null) {
@@ -212,10 +212,14 @@ class _LogWidgetState extends State<LogWidget> {
               itemCount: entries.length,
               itemBuilder: (context, i) {
                 final entry = entries[i];
+                final title = entry.length != 0
+                    ? '${entry.habitName} (${entry.length} min)'
+                    : entry.habitName;
+
                 return HabitCard(
                   backgroundColor: colorScheme.surface,
                   textColor: colorScheme.secondary,
-                  title: entry.habitName,
+                  title: title,
                   comments: entry.comments,
                   onTap: () => _onEdit(context: context, entry: entry),
                   onLongPress: () {

@@ -69,7 +69,7 @@ class Dialogs {
                       style: const TextStyle(fontSize: 12),
                       controller: textController1,
                       decoration: const InputDecoration(
-                        hintText: 'Habit name',
+                        hintText: 'Habit Name',
                         border: OutlineInputBorder(),
                       ),
                       autofocus: true,
@@ -90,7 +90,7 @@ class Dialogs {
                       style: const TextStyle(fontSize: 12),
                       controller: textController3,
                       decoration: const InputDecoration(
-                        hintText: 'Length in mins',
+                        hintText: 'Length (mins)',
                         border: OutlineInputBorder(),
                       ),
                       autofocus: true,

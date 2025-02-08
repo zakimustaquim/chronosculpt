@@ -221,7 +221,7 @@ class PastHabitsWidget extends StatefulWidget {
           map[entry.hid]!.occurrences.add(entry);
         } else {
           HabitRetrospective hr = HabitRetrospective(
-            name: cleanName(entry.habitName),
+            name: entry.habitName,
             occurrences: [entry],
             hid: entry.hid,
           );
@@ -449,6 +449,10 @@ class _PastRecordDisplayWidgetState extends State<PastRecordDisplayWidget> {
                 String name = entry.habitName;
                 String comments = entry.comments;
                 bool done = entry.done;
+
+                if (entry.length != 0) {
+                  name = '$name (${entry.length} min)';
+                }
 
                 if (entry.split != null) {
                   name = '$name - ${formatSplit(entry.split! * 1.0)}';

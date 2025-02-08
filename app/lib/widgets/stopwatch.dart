@@ -206,7 +206,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
         title: Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: Text(
-            cleanName(widget.entry.habitName),
+            widget.entry.habitName,
             style: TextStyle(
               color: colorScheme.surface,
             ),

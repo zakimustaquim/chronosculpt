@@ -160,7 +160,7 @@ class Entry extends Cloneable {
 
   int getSearchPriority() {
     if (doneAt == null) {
-      return getLengthOfHabit(habitName);
+      return length;
     } else {
       return doneAt!.millisecondsSinceEpoch;
     }
@@ -396,91 +396,7 @@ class LiveSplitUnit {
     this.status = LiveSplitStatus.waiting,
   });
 
-  String get name => cleanName(entry.habitName);
-}
-
-Map<String, int> habitLengths = {};
-
-/// Returns the user-inputted length of a habit. The
-/// length is specified by adding "(X min)" to the
-/// end of the habit name.
-/// (DEPRECATED)
-int getLengthOfHabit(String s) {
-  if (s.isEmpty) return 0;
-
-  if (habitLengths.containsKey(s)) {
-    return habitLengths[s]!;
-  }
-
-  List<String> split = s.split('(');
-  int guess = 0;
-
-  for (String str in split) {
-    int parsed = parseProbableString(str);
-    if (parsed > 0) guess = parsed;
-  }
-
-  habitLengths[s] = guess;
-  return guess;
-}
-
-/// Looks for the first number in s, returns 0 if there are none
-int parseProbableString(String s) {
-  List<String> tokens = s.split(' ');
-  for (String str in tokens) {
-    String removed = removeRightParenthesis(str);
-    int? parsed = int.tryParse(removeRightParenthesis(str));
-    if (parsed == null) {
-      if (removed != str) {
-        return 0;
-      } else {
-        continue;
-      }
-    } else {
-      return parsed;
-    }
-  }
-  return 0;
-}
-
-/// Removes the any right parentheses in s.
-String removeRightParenthesis(String s) {
-  if (s.contains(')')) {
-    var chars = s.split('');
-    StringBuffer newString = StringBuffer();
-    for (int i = 0; i < chars.length; i++) {
-      if (chars[i] != ')') newString.write(chars[i]);
-    }
-    return newString.toString();
-  } else {
-    return s;
-  }
-}
-
-Map<String, String> cleanedNames = {};
-
-/// Removes anything in parentheses and trims.
-String cleanName(String name) {
-  if (cleanedNames.containsKey(name)) {
-    return cleanedNames[name]!;
-  }
-
-  StringBuffer sb = StringBuffer();
-  bool writing = true;
-  for (var char in name.split('')) {
-    if (char == '(') {
-      writing = false;
-    } else if (char == ')') {
-      writing = true;
-    } else if (writing) {
-      sb.write(char);
-    }
-  }
-
-  var res = sb.toString().trim();
-
-  cleanedNames[name] = res;
-  return res;
+  String get name => entry.habitName;
 }
 
 /// Gets the total length of a list of entries.
@@ -489,7 +405,7 @@ String cleanName(String name) {
 int getTimesink(List<Entry> entries) {
   int res = 0;
   for (var entry in entries) {
-    res += getLengthOfHabit(entry.habitName);
+    res += entry.length;
   }
   return res;
 }
