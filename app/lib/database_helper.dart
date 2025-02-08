@@ -112,6 +112,7 @@ class DatabaseHelper {
       'comments': h.comments,
       'preferredQuadrant': h.preferredQuadrant,
       'active': h.active,
+      'length': h.length,
     };
 
     final response = await http.put(
@@ -144,11 +145,13 @@ class DatabaseHelper {
     required String name,
     required String comments,
     required int preferredQuadrant,
+    required int length,
   }) async {
     var requestBody = {
       'name': name,
       'comments': comments,
       'preferredQuadrant': preferredQuadrant,
+      'length': length,
     };
 
     final response = await http.post(

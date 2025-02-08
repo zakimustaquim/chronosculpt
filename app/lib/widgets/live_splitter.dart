@@ -1,12 +1,9 @@
 import 'dart:async';
-import 'dart:io';
-
 import 'package:chronosculpt/config.dart';
 import 'package:chronosculpt/data_structures.dart';
 import 'package:chronosculpt/database_helper.dart';
 import 'package:chronosculpt/main.dart';
 import 'package:chronosculpt/widgets/history.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 /// Displays a list of entries as a reorderable list
@@ -294,8 +291,6 @@ class _LiveSplitterState extends State<LiveSplitter> {
             Expanded(
               child: ReorderableListView.builder(
                 itemBuilder: (context, index) {
-                  final isMobile =
-                      !kIsWeb && (Platform.isAndroid || Platform.isIOS);
                   var unit = _units[index];
 
                   if (isMobile) {

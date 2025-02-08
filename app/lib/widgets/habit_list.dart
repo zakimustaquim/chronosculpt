@@ -84,16 +84,19 @@ class _HabitListWidgetState extends State<HabitListWidget> {
       initialQuadrant: habit.preferredQuadrant,
       initialValue1: habit.name,
       initialValue2: habit.comments,
+      initialValue3: '${habit.length}',
     );
 
     if (userInput != null &&
         userInput.first != null &&
         userInput.second != null &&
-        userInput.preferredQuadrant != null) {
+        userInput.preferredQuadrant != null &&
+        userInput.length != null) {
       Habit temp = habit.clone();
       temp.name = userInput.first!;
       temp.comments = userInput.second!;
       temp.preferredQuadrant = userInput.preferredQuadrant!;
+      temp.length = userInput.length!;
       try {
         await DatabaseHelper().updateHabit(temp);
         habit.updateFrom(temp);
@@ -115,16 +118,19 @@ class _HabitListWidgetState extends State<HabitListWidget> {
     if (userInput != null &&
         userInput.first != null &&
         userInput.second != null &&
-        userInput.preferredQuadrant != null) {
+        userInput.preferredQuadrant != null &&
+        userInput.length != null) {
       var name = userInput.first!;
       var comments = userInput.second!;
       var preferredQuadrant = userInput.preferredQuadrant!;
+      var length = userInput.length!;
       try {
         Habit h = await DatabaseHelper().createHabit(
           getCurrentUserUid(),
           name: name,
           comments: comments,
           preferredQuadrant: preferredQuadrant,
+          length: length,
         );
         setState(() => habitsList.add(h));
       } catch (e) {

@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:chronosculpt/config.dart';
 import 'package:chronosculpt/data_structures.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,22 +10,28 @@ int selectedQuadrant = 0;
 class Dialogs {
   /// Shows a dialog with a title and comments box
   /// and optional quadrant selection.
-  static Future<({String? first, String? second, int? preferredQuadrant})?>
-      showEditDialog({
+  static Future<
+      ({
+        String? first,
+        String? second,
+        int? preferredQuadrant,
+        int? length
+      })?> showEditDialog({
     required BuildContext context,
     required bool showQuadrantSelection,
     required int initialQuadrant,
     String? title,
     String? initialValue1,
     String? initialValue2,
+    String? initialValue3,
   }) async {
     final TextEditingController textController1 =
         TextEditingController(text: initialValue1 ?? '');
     final TextEditingController textController2 =
         TextEditingController(text: initialValue2 ?? '');
+    final TextEditingController textController3 =
+        TextEditingController(text: initialValue3 ?? '');
 
-    // trying to get the Platform directly throws an error on web
-    final isMobile = !kIsWeb && (Platform.isAndroid || Platform.isIOS);
     if (showQuadrantSelection) selectedQuadrant = initialQuadrant;
 
     return showDialog<
@@ -34,6 +39,7 @@ class Dialogs {
           String? first,
           String? second,
           int? preferredQuadrant,
+          int? length,
         })>(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -53,23 +59,48 @@ class Dialogs {
           ),
           content: Column(
             children: [
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.8,
-                height: MediaQuery.of(context).size.height * 0.08,
-                child: TextField(
-                  textCapitalization: TextCapitalization.sentences,
-                  style: const TextStyle(fontSize: 12),
-                  controller: textController1,
-                  decoration: const InputDecoration(
-                    hintText: 'Type here...',
-                    border: OutlineInputBorder(),
+              Row(
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.6,
+                    height: MediaQuery.of(context).size.height * 0.08,
+                    child: TextField(
+                      textCapitalization: TextCapitalization.sentences,
+                      style: const TextStyle(fontSize: 12),
+                      controller: textController1,
+                      decoration: const InputDecoration(
+                        hintText: 'Habit name',
+                        border: OutlineInputBorder(),
+                      ),
+                      autofocus: true,
+                      maxLines: null,
+                      expands: true,
+                      textAlignVertical: TextAlignVertical.top,
+                      keyboardType: TextInputType.multiline,
+                    ),
                   ),
-                  autofocus: true,
-                  maxLines: null,
-                  expands: true,
-                  textAlignVertical: TextAlignVertical.top,
-                  keyboardType: TextInputType.multiline,
-                ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.05,
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.15,
+                    height: MediaQuery.of(context).size.height * 0.08,
+                    child: TextField(
+                      textCapitalization: TextCapitalization.sentences,
+                      style: const TextStyle(fontSize: 12),
+                      controller: textController3,
+                      decoration: const InputDecoration(
+                        hintText: 'Length in mins',
+                        border: OutlineInputBorder(),
+                      ),
+                      autofocus: true,
+                      maxLines: null,
+                      expands: true,
+                      textAlignVertical: TextAlignVertical.top,
+                      keyboardType: TextInputType.multiline,
+                    ),
+                  ),
+                ],
               ),
               SizedBox(height: isMobile ? 0.0 : 16.0),
               isMobile || !showQuadrantSelection
@@ -108,12 +139,23 @@ class Dialogs {
             ElevatedButton(
               child: const Text('Confirm'),
               onPressed: () {
+                if (textController1.text.isEmpty) {
+                  showAlertDialog(context, 'Please enter a habit name.');
+                  return;
+                }
+
+                if (int.tryParse(textController3.text) == null) {
+                  showAlertDialog(context, 'Please enter a valid length.');
+                  return;
+                }
+
                 Navigator.of(dialogContext).pop(
                   (
                     first: textController1.text,
                     second: textController2.text,
                     preferredQuadrant:
                         !showQuadrantSelection ? 0 : selectedQuadrant,
+                    length: int.parse(textController3.text),
                   ),
                 );
               },

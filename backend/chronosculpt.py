@@ -65,7 +65,8 @@ def init_db(reset=False):
             comments TEXT NOT NULL,
             preferredQuadrant INTEGER CHECK (preferredQuadrant BETWEEN 0 AND 4),
             since TIMESTAMP DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'UTC'),
-            active BOOLEAN DEFAULT TRUE
+            active BOOLEAN DEFAULT TRUE,
+            length INTEGER DEFAULT 0
         )
     ''')
 
@@ -92,7 +93,8 @@ def init_db(reset=False):
             done BOOLEAN NOT NULL DEFAULT FALSE,
             quadrant INTEGER NOT NULL,
             doneAt BIGINT,
-            split INTEGER
+            split INTEGER,
+            length INTEGER DEFAULT 0
         )
     ''')
     
@@ -120,7 +122,8 @@ def get_habits_by_user_id(user_id):
                             'comments': habit[3],
                             'preferredQuadrant': habit[4],
                             'since': habit[5],
-                            'active': habit[6]
+                            'active': habit[6],
+                            'length': habit[7]
                         } 
                         for habit in habits
                     ]
@@ -180,7 +183,8 @@ def get_entries_by_rid(rid):
                     'quadrant': entry[5],
                     'doneAt': entry[6],
                     'split': entry[7],
-                    'habit_name': entry[8],
+                    'length': entry[8],
+                    'habit_name': entry[9],
                 } 
                 for entry in entries
             ]
@@ -287,7 +291,8 @@ def update_entry(entry_id):
                     'quadrant': entry[5],
                     'doneAt': entry[6],
                     'split': entry[7],
-                    'habit_name': entry[8]
+                    'length': entry[8],
+                    'habit_name': entry[9]
                  } 
         g.db.commit()
         return jsonify(result), 200
@@ -326,9 +331,9 @@ def create_record(user_id, timestamp):
         
         for habit in habits:
             g.cursor.execute('''
-                INSERT INTO entries (rid, hid, comments, quadrant)
-                VALUES (%s, %s, %s, %s);
-            ''', (record_id, habit['hid'], habit['comments'], habit['preferredQuadrant']))
+                INSERT INTO entries (rid, hid, comments, quadrant, length)
+                VALUES (%s, %s, %s, %s, %s);
+            ''', (record_id, habit['hid'], habit['comments'], habit['preferredQuadrant'], habit['length']))
 
         result = {
                     'rid': record[0],
@@ -355,12 +360,13 @@ def add_habit(user_id):
         name = data.get('name')
         comments = data.get('comments')
         preferred_quadrant = data.get('preferredQuadrant')
+        length = data.get('length')
 
         g.cursor.execute('''
-            INSERT INTO habits (uid, name, comments, preferredQuadrant)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO habits (uid, name, comments, preferredQuadrant, length)
+            VALUES (%s, %s, %s, %s, %s)
             RETURNING *;
-        ''', (user_id, name, comments, preferred_quadrant))
+        ''', (user_id, name, comments, preferred_quadrant, length))
         habit = g.cursor.fetchone()
 
         result = {
@@ -370,7 +376,8 @@ def add_habit(user_id):
                     'comments': habit[3],
                     'preferredQuadrant': habit[4],
                     'since': habit[5],
-                    'active': habit[6]
+                    'active': habit[6],
+                    'length': habit[7]
                  } 
         g.db.commit()
         return jsonify(result), 200
@@ -387,13 +394,14 @@ def update_habit(habit_id):
         comments = data.get('comments')
         preferred_quadrant = data.get('preferredQuadrant')
         active = data.get('active')
+        length = data.get('length')
 
         g.cursor.execute('''
             UPDATE habits
-            SET name = %s, comments = %s, preferredquadrant = %s, active = %s
+            SET name = %s, comments = %s, preferredquadrant = %s, active = %s, length = %s
             WHERE hid = %s
             RETURNING *;
-        ''', (name, comments, preferred_quadrant, active, habit_id))
+        ''', (name, comments, preferred_quadrant, active, length, habit_id))
 
         habit = g.cursor.fetchone()
 
@@ -404,7 +412,8 @@ def update_habit(habit_id):
                     'comments': habit[3],
                     'preferredQuadrant': habit[4],
                     'since': habit[5],
-                    'active': habit[6]
+                    'active': habit[6],
+                    'length': habit[7]
                  } 
         g.db.commit()
         return jsonify(result), 200

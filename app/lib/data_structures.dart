@@ -9,6 +9,7 @@ abstract class Cloneable {
 /// are mapped onto this class.
 class Habit extends Cloneable {
   int hid;
+  int length;
   String uid;
   String name;
   String comments;
@@ -24,6 +25,7 @@ class Habit extends Cloneable {
     required this.preferredQuadrant,
     required this.since,
     required this.active,
+    required this.length,
   });
 
   factory Habit.fromMap(Map<String, dynamic> habit) {
@@ -35,6 +37,7 @@ class Habit extends Cloneable {
       preferredQuadrant: habit['preferredQuadrant'],
       since: parseString(habit['since']),
       active: habit['active'],
+      length: habit['length'],
     );
   }
 
@@ -52,6 +55,7 @@ class Habit extends Cloneable {
       name: name,
       uid: uid,
       hid: hid,
+      length: length,
     );
   }
 
@@ -63,6 +67,7 @@ class Habit extends Cloneable {
     preferredQuadrant = h.preferredQuadrant;
     since = h.since;
     active = h.active;
+    length = h.length;
   }
 }
 
@@ -79,6 +84,7 @@ class Entry extends Cloneable {
   DateTime? doneAt;
   int? split;
   DateTime? dateOfOccurrence;
+  int length;
 
   Entry({
     required this.eid,
@@ -88,6 +94,7 @@ class Entry extends Cloneable {
     required this.comments,
     required this.done,
     required this.quadrant,
+    required this.length,
     this.doneAt,
     this.split,
     this.dateOfOccurrence,
@@ -114,6 +121,7 @@ class Entry extends Cloneable {
       quadrant: entry['quadrant'],
       doneAt: doneAt,
       split: split,
+      length: entry['length'],
     );
   }
 
@@ -133,6 +141,7 @@ class Entry extends Cloneable {
       doneAt: doneAt,
       split: split,
       quadrant: quadrant,
+      length: length,
     );
   }
 
@@ -146,6 +155,7 @@ class Entry extends Cloneable {
     doneAt = e.doneAt;
     split = e.split;
     quadrant = e.quadrant;
+    length = e.length;
   }
 
   int getSearchPriority() {
@@ -394,6 +404,7 @@ Map<String, int> habitLengths = {};
 /// Returns the user-inputted length of a habit. The
 /// length is specified by adding "(X min)" to the
 /// end of the habit name.
+/// (DEPRECATED)
 int getLengthOfHabit(String s) {
   if (s.isEmpty) return 0;
 
