@@ -169,31 +169,31 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
   }
 
   String _getMinSplit() {
-    for (var hr in PastHabitsWidget.past30DaysHabits) {
-      if (hr.hid == widget.entry.hid) {
-        int minSplit = hr.minSplit;
-        if (minSplit == 0) {
-          return "N/A";
-        } else {
-          return formatSplit(minSplit * 1.0);
-        }
+    if (PastHabitsWidget.past30DaysHabitsMap[widget.entry.hid] != null) {
+      var hr = PastHabitsWidget.past30DaysHabitsMap[widget.entry.hid];
+      int minSplit = hr!.minSplit;
+      if (minSplit == 0) {
+        return "N/A";
+      } else {
+        return formatSplit(minSplit * 1.0);
       }
+    } else {
+      return "N/A";
     }
-    return "N/A";
   }
 
   String _getAverageSplit() {
-    for (var hr in PastHabitsWidget.past30DaysHabits) {
-      if (hr.hid == widget.entry.hid) {
-        double averageSplit = hr.averageSplit;
-        if (averageSplit == 0) {
-          return "N/A";
-        } else {
-          return formatSplit(hr.averageSplit * 1.0);
-        }
+    if (PastHabitsWidget.past30DaysHabitsMap[widget.entry.hid] != null) {
+      var hr = PastHabitsWidget.past30DaysHabitsMap[widget.entry.hid];
+      double averageSplit = hr!.averageSplit;
+      if (averageSplit == 0) {
+        return "N/A";
+      } else {
+        return formatSplit(averageSplit);
       }
+    } else {
+      return "N/A";
     }
-    return "N/A";
   }
 
   @override

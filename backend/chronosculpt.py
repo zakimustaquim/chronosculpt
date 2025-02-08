@@ -430,6 +430,19 @@ def delete_habit(habit_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Route to wake up the server
+@app.route('/wakeup', methods=['GET'])
+def wakeup():
+    try:
+        g.cursor.execute('''
+            SELECT rid
+            FROM records
+            LIMIT 1;
+        ''')
+        return jsonify({'message': 'server is awake!'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)

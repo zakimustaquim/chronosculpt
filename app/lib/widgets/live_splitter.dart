@@ -41,11 +41,11 @@ class _LiveSplitterState extends State<LiveSplitter> {
             entry: element,
             averageSplit: getAverageSplit(
               element.hid,
-              PastHabitsWidget.past30DaysHabits,
+              PastHabitsWidget.past30DaysHabitsMap,
             ),
             minSplit: getMinSplit(
               element.hid,
-              PastHabitsWidget.past30DaysHabits,
+              PastHabitsWidget.past30DaysHabitsMap,
             ),
           ),
         )

@@ -390,6 +390,7 @@ class LiveSplitUnit {
 }
 
 Map<String, int> habitLengths = {};
+
 /// Returns the user-inputted length of a habit. The
 /// length is specified by adding "(X min)" to the
 /// end of the habit name.
@@ -446,6 +447,7 @@ String removeRightParenthesis(String s) {
 }
 
 Map<String, String> cleanedNames = {};
+
 /// Removes anything in parentheses and trims.
 String cleanName(String name) {
   if (cleanedNames.containsKey(name)) {
@@ -506,17 +508,19 @@ String formatDateForPastRecord(DateTime date) {
 }
 
 /// Finds the average split associated with a given entry.
-double getAverageSplit(int hid, List<HabitRetrospective> hrs) {
-  for (var hr in hrs) {
-    if (hr.hid == hid) return hr.averageSplit;
+double getAverageSplit(int hid, Map<int, HabitRetrospective> hrs) {
+  if (hrs[hid] != null) {
+    return hrs[hid]!.averageSplit;
+  } else {
+    return 0;
   }
-  return 0;
 }
 
 /// Finds the average split associated with a given entry.
-int getMinSplit(int hid, List<HabitRetrospective> hrs) {
-  for (var hr in hrs) {
-    if (hr.hid == hid) return hr.minSplit;
+int getMinSplit(int hid, Map<int, HabitRetrospective> hrs) {
+  if (hrs[hid] != null) {
+    return hrs[hid]!.minSplit;
+  } else {
+    return 0;
   }
-  return 0;
 }

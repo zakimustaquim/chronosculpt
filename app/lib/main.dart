@@ -19,7 +19,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Wake up server if it's asleep
-  DatabaseHelper().wakeUpDatabase();
+  await awakenDatabase();
 
   // Initialize authentication
   await Firebase.initializeApp(
@@ -31,6 +31,13 @@ void main() async {
   if (getCurrentUserUid() != 'none') PastHabitsWidget.retrieveAndAnalyzeData();
 
   runApp(const ChronosculptApp());
+}
+
+Future<void> awakenDatabase() async {
+  await Future.any([
+    DatabaseHelper().wakeUpDatabase(),
+    Future.delayed(const Duration(seconds: 3))
+  ]);
 }
 
 /// Returns the user ID of the currently logged in user.

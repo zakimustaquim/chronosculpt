@@ -207,6 +207,7 @@ class DonePercentage extends StatelessWidget {
 /// Displays detailed information at the habit level.
 class PastHabitsWidget extends StatefulWidget {
   static List<HabitRetrospective> past30DaysHabits = [];
+  static Map<int, HabitRetrospective> past30DaysHabitsMap = {};
   final List<Record> records;
   const PastHabitsWidget({super.key, required this.records});
 
@@ -231,6 +232,7 @@ class PastHabitsWidget extends StatefulWidget {
 
     PastHabitsWidget.past30DaysHabits =
         map.entries.toList().map((e) => e.value).toList();
+    PastHabitsWidget.past30DaysHabitsMap = map;
   }
 
   static Future<void> retrieveAndAnalyzeData() async {

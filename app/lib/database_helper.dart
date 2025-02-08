@@ -171,7 +171,7 @@ class DatabaseHelper {
   // Temporary workaround while I look for a different database service.
   Future<void> wakeUpDatabase() async {
     for (int i = 0; i < 8; i++) {
-      final response = await http.get(Uri.parse('$backendPath/habits/wakeup'));
+      final response = await http.get(Uri.parse('$backendPath/wakeup'));
       if (response.statusCode == 200) break;
     }
   }
