@@ -49,13 +49,14 @@ Long pressing on a quadrant launches a multitimer view which enables users to fr
 Chronosculpt offers history reporting at both the record and habit level.
 
 #### Record History
-<img width="259" src="https://github.com/user-attachments/assets/7b51c49b-e38c-429a-b3ee-8ecc678660ae" />
+<img width="259" src="https://github.com/user-attachments/assets/39e6f2ca-5f06-4af5-9d43-a58d11a31e5c" />
+<img width="259" src="https://github.com/user-attachments/assets/cdc1fdbc-3ad1-47c0-8a47-4f018e446f14" />
 <img width="259" src="https://github.com/user-attachments/assets/1a18eb5a-fb71-4406-8876-e63bffe0fde3" />
 
 All previous records are displayed along with the proportion of habits that were completed. Tapping on a given record launches a view with detailed reporting of habit activity.
 
 #### Habit History
-<img width="259" src="https://github.com/user-attachments/assets/dbc1b17e-879b-416c-9370-803664e1a8d2" />
+<img width="259" src="https://github.com/user-attachments/assets/e35bc9d5-dc40-4a63-89ae-4b8ea4700b8d" />
 <img width="259" src="https://github.com/user-attachments/assets/e8ddf5cb-6245-4d33-88c6-74b4802f5823" />
 
 All previous habits are displayed along with the proportion of occurrences that were completed. Tapping on a given habit launches a view with all occurrences laid out sequentially.
