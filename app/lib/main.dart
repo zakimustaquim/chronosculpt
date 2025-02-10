@@ -13,6 +13,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
+/// Global variable that stores the number of previous days
+/// to read from the database for the history widget.
+int historyPreference = 30;
+
 /// Before running the app, initialize Firebase
 /// and sign out if the user requested it on login.
 void main() async {
@@ -26,6 +30,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await SharedPreferencesHelper().forgetIfRequested();
+
+  // Retrieve history preference (stores in global variable)
+  await SharedPreferencesHelper().getPreferredHistory();
 
   // Retrieve and analyze past data
   if (getCurrentUserUid() != 'none') PastHabitsWidget.retrieveAndAnalyzeData();
@@ -70,7 +77,7 @@ class ChronosculptApp extends StatelessWidget {
         colorScheme: colorScheme,
         useMaterial3: true,
         tooltipTheme: TooltipThemeData(
-          // will update when tooltip ignoring pointer is implemented
+          // will update when tooltip ignoring pointer is implemented in SDK
           verticalOffset: 36.0,
           exitDuration: const Duration(seconds: 0),
           textStyle: TextStyle(
@@ -102,6 +109,7 @@ class MainWidget extends StatefulWidget {
 class _MainWidgetState extends State<MainWidget> {
   var selectedIndex = 0;
   var dataLoaded = false;
+  Key _historyKey = UniqueKey();
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +143,9 @@ class _MainWidgetState extends State<MainWidget> {
         textColor = colorScheme.secondary;
         break;
       case 3:
-        page = const HistoryWidgetWrapper();
+        page = HistoryWidgetWrapper(
+          key: _historyKey,
+        );
         appBarText = "History";
         appBarColor = colorScheme.secondary;
         textColor = colorScheme.surface;
@@ -154,8 +164,16 @@ class _MainWidgetState extends State<MainWidget> {
           style: TextStyle(color: textColor),
         ),
         actions: [
+          selectedIndex == 3
+              ? HistoryPopupMenu(
+                  value: historyPreference,
+                  refresher: () => setState(() {
+                    _historyKey = UniqueKey();
+                  }),
+                )
+              : const SizedBox(),
           Padding(
-            padding: const EdgeInsets.only(right: 8.0),
+            padding: const EdgeInsets.only(right: 16.0),
             child: ElevatedButton(
               onPressed: () {
                 Navigator.push(

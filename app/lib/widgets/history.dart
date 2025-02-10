@@ -1,5 +1,6 @@
 import 'package:chronosculpt/database_helper.dart';
 import 'package:chronosculpt/main.dart';
+import 'package:chronosculpt/shared_preferences_helper.dart';
 import 'package:chronosculpt/widgets/misc_widgets.dart';
 import 'package:chronosculpt/data_structures.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,7 @@ class _HistoryWidgetWrapperState extends State<HistoryWidgetWrapper> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Record>>(
-      future: DatabaseHelper().getPast30Days(getCurrentUserUid()),
+      future: DatabaseHelper().getPastRecords(getCurrentUserUid()),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const LoadingScreen();
@@ -39,11 +40,74 @@ class _HistoryWidgetWrapperState extends State<HistoryWidgetWrapper> {
   }
 }
 
+class HistoryPopupMenu extends StatefulWidget {
+  final Function refresher;
+  final int value;
+
+  const HistoryPopupMenu({
+    super.key,
+    required this.refresher,
+    required this.value,
+  });
+
+  @override
+  State<HistoryPopupMenu> createState() => _HistoryPopupMenuState();
+}
+
+class _HistoryPopupMenuState extends State<HistoryPopupMenu> {
+  @override
+  Widget build(BuildContext context) {
+    var colorScheme = Theme.of(context).colorScheme;
+    var textStyle = TextStyle(color: colorScheme.secondary);
+
+    var items = [
+      PopupMenuItem<int>(
+        value: 7,
+        child: Text('Past week', style: textStyle),
+      ),
+      PopupMenuItem<int>(
+        value: 14,
+        child: Text('Past 2 weeks', style: textStyle),
+      ),
+      PopupMenuItem<int>(
+        value: 30,
+        child: Text('Past month', style: textStyle),
+      ),
+      PopupMenuItem<int>(
+        value: 90,
+        child: Text('Past 3 months', style: textStyle),
+      ),
+      PopupMenuItem<int>(
+        value: 0,
+        child: Text('All time', style: textStyle),
+      ),
+    ];
+
+    return PopupMenuButton<int>(
+      tooltip: 'Change history view',
+      borderRadius: BorderRadius.circular(50),
+      initialValue: widget.value,
+      onSelected: (value) async {
+        await SharedPreferencesHelper().setPreferredHistory(value);
+        widget.refresher();
+      },
+      itemBuilder: (context) => items,
+      child: Padding(
+        padding: const EdgeInsets.only(right: 8.0),
+        child: Icon(Icons.more_horiz, color: colorScheme.surface),
+      ),
+    );
+  }
+}
+
 /// Launches the two main views for displaying
 /// past history data.
 class HistoryWidget extends StatefulWidget {
   final List<Record> records;
-  const HistoryWidget({super.key, required this.records});
+  const HistoryWidget({
+    super.key,
+    required this.records,
+  });
 
   @override
   State<HistoryWidget> createState() => _HistoryWidgetState();
@@ -233,11 +297,13 @@ class PastHabitsWidget extends StatefulWidget {
     PastHabitsWidget.past30DaysHabits =
         map.entries.toList().map((e) => e.value).toList();
     PastHabitsWidget.past30DaysHabitsMap = map;
+
+    past30DaysHabits.sort((a, b) => b.donePercentage.compareTo(a.donePercentage)); 
   }
 
   static Future<void> retrieveAndAnalyzeData() async {
     try {
-      var data = await DatabaseHelper().getPast30Days(getCurrentUserUid());
+      var data = await DatabaseHelper().getPastRecords(getCurrentUserUid());
       analyzeData(data);
     } catch (e) {
       // showSnackBar(context, e.toString());

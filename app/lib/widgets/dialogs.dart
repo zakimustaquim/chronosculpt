@@ -162,7 +162,8 @@ class Dialogs {
                   return;
                 }
 
-                if (int.tryParse(textController3.text) == null) {
+                if (textController3.text.isNotEmpty &&
+                    int.tryParse(textController3.text) == null) {
                   showAlertDialog(context, 'Please enter a valid length.');
                   return;
                 }
@@ -173,7 +174,9 @@ class Dialogs {
                     second: textController2.text,
                     preferredQuadrant:
                         !showQuadrantSelection ? 0 : selectedQuadrant,
-                    length: int.parse(textController3.text),
+                    length: textController3.text.isNotEmpty
+                        ? int.parse(textController3.text)
+                        : 0,
                   ),
                 );
               },

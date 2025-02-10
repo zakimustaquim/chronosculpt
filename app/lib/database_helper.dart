@@ -1,3 +1,4 @@
+import 'package:chronosculpt/main.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:chronosculpt/data_structures.dart';
@@ -45,8 +46,9 @@ class DatabaseHelper {
     return await getRecordsByTimestamp(uid, date.millisecondsSinceEpoch);
   }
 
-  Future<List<Record>> getPast30Days(String uid) async {
-    var date = DateTime.now().subtract(const Duration(days: 31));
+  Future<List<Record>> getPastRecords(String uid) async {
+    int daysPast = historyPreference; // retrieve from global variable in main.dart
+    var date = daysPast == 0 ? DateTime(2000) : DateTime.now().subtract(Duration(days: daysPast + 1));
     var recordsList =
         await getRecordsByTimestamp(uid, date.millisecondsSinceEpoch);
     recordsList
@@ -173,9 +175,10 @@ class DatabaseHelper {
 
   // Temporary workaround while I look for a different database service.
   Future<void> wakeUpDatabase() async {
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 10; i++) {
       final response = await http.get(Uri.parse('$backendPath/wakeup'));
       if (response.statusCode == 200) break;
+      await Future.delayed(const Duration(milliseconds: 100));
     }
   }
 

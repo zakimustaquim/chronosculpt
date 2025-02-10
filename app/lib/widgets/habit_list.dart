@@ -84,7 +84,7 @@ class _HabitListWidgetState extends State<HabitListWidget> {
       initialQuadrant: habit.preferredQuadrant,
       initialValue1: habit.name,
       initialValue2: habit.comments,
-      initialValue3: '${habit.length}',
+      initialValue3: habit.length == 0 ? '' : '${habit.length}',
     );
 
     if (userInput != null &&
