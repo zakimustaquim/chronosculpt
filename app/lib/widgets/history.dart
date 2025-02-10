@@ -113,8 +113,8 @@ class HistoryWidget extends StatefulWidget {
   State<HistoryWidget> createState() => _HistoryWidgetState();
 }
 
+final _selectedView = <bool>[true, false];
 class _HistoryWidgetState extends State<HistoryWidget> {
-  final _selectedView = <bool>[true, false];
   List<Widget> _tabs = [];
   int _view = 0;
 
