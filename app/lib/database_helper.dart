@@ -178,7 +178,7 @@ class DatabaseHelper {
     for (int i = 0; i < 10; i++) {
       final response = await http.get(Uri.parse('$backendPath/wakeup'));
       if (response.statusCode == 200) break;
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 250));
     }
   }
 

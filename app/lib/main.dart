@@ -43,7 +43,7 @@ void main() async {
 Future<void> awakenDatabase() async {
   await Future.any([
     DatabaseHelper().wakeUpDatabase(),
-    Future.delayed(const Duration(seconds: 3))
+    Future.delayed(const Duration(seconds: 5))
   ]);
 }
 
