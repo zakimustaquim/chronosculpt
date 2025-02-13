@@ -1,4 +1,3 @@
-import 'package:chronosculpt/database_helper.dart';
 import 'package:chronosculpt/firebase_helper.dart';
 import 'package:chronosculpt/firebase_options.dart';
 import 'package:chronosculpt/shared_preferences_helper.dart';
@@ -22,9 +21,6 @@ int historyPreference = 30;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Wake up server if it's asleep
-  await awakenDatabase();
-
   // Initialize authentication
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -38,13 +34,6 @@ void main() async {
   if (getCurrentUserUid() != 'none') PastHabitsWidget.retrieveAndAnalyzeData();
 
   runApp(const ChronosculptApp());
-}
-
-Future<void> awakenDatabase() async {
-  await Future.any([
-    DatabaseHelper().wakeUpDatabase(),
-    Future.delayed(const Duration(seconds: 5))
-  ]);
 }
 
 /// Returns the user ID of the currently logged in user.

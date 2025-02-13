@@ -17,24 +17,17 @@ CORS(app)
 # Load connection string
 connection_string = os.getenv('NEON_STRING')
 
-# Create connection pool
-db_pool = SimpleConnectionPool(
-    1,
-    10,
-    connection_string,
-)
-
-# Get connection from pool
+# Get connection
 @app.before_request
 def get_db():
     try:
         if 'db' not in g:
-            g.db = db_pool.getconn()
+            g.db = psycopg2.connect(connection_string)
             g.cursor = g.db.cursor(cursor_factory=DictCursor)
     except psycopg2.pool.PoolError:
         return jsonify({'error': 'Server overloaded'}), 503
 
-# Return connection to pool
+# Close connection
 @app.teardown_appcontext
 def close_db(error):
     db = g.pop('db', None)
@@ -42,7 +35,7 @@ def close_db(error):
     if cursor is not None:
         cursor.close()
     if db is not None:
-        db_pool.putconn(db)
+        db.close()
 
 
 # Initialize the database and create necessary tables
