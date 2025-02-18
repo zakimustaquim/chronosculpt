@@ -1,6 +1,7 @@
 import 'package:chronosculpt/main.dart';
 import 'package:chronosculpt/shared_preferences_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:chronosculpt/firebase_helper.dart';
 
 /// Main splash screen for the app, shown on first launch
@@ -29,6 +30,28 @@ class _SplashWidgetState extends State<SplashWidget> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class AboutButton extends StatelessWidget {
+  const AboutButton({super.key});
+
+  Future<void> _launchInNewTab(BuildContext context) async {
+    String url = 'https://github.com/zakimustaquim/chronosculpt/';
+    try {
+      await launchUrl(Uri.parse(url), webOnlyWindowName: '_blank');
+    } catch (e) {
+      showSnackBar(context,
+          'There was an error launching the URL (https://github.com/zakimustaquim/chronosculpt/).');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () => _launchInNewTab(context),
+      child: const Text('About This Project'),
     );
   }
 }
@@ -128,24 +151,30 @@ class _LoginSignupButtonsState extends State<LoginSignupButtons> {
       opacity: _visible ? 1.0 : 0.0,
       duration: const Duration(milliseconds: 1000),
       curve: Curves.easeIn,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Column(
         children: [
-          ElevatedButton(
-            onPressed: () => _startActivity('Sign Up'),
-            child: Text(
-              'Sign Up',
-              style: TextStyle(color: colorScheme.secondary),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () => _startActivity('Sign Up'),
+                child: Text(
+                  'Sign Up',
+                  style: TextStyle(color: colorScheme.secondary),
+                ),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: () => _startActivity('Login'),
+                child: Text(
+                  'Log In',
+                  style: TextStyle(color: colorScheme.secondary),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 8),
-          ElevatedButton(
-            onPressed: () => _startActivity('Login'),
-            child: Text(
-              'Log In',
-              style: TextStyle(color: colorScheme.secondary),
-            ),
-          ),
+          const SizedBox(height: 48.0),
+          const AboutButton(),
         ],
       ),
     );
