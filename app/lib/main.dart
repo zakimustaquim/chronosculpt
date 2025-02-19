@@ -1,3 +1,4 @@
+import 'package:chronosculpt/database_helper.dart';
 import 'package:chronosculpt/firebase_helper.dart';
 import 'package:chronosculpt/firebase_options.dart';
 import 'package:chronosculpt/shared_preferences_helper.dart';
@@ -20,6 +21,10 @@ int historyPreference = 30;
 /// "continue as guest" was selected.
 String? tempUid;
 
+/// Global variable that stores the whether the app
+/// has been initialized.
+bool initialized = false;
+
 /// Before running the app, initialize Firebase
 /// and sign out if the user requested it on login.
 void main() async {
@@ -30,9 +35,6 @@ void main() async {
 
   // Retrieve history preference (stores in global variable)
   await SharedPreferencesHelper().getPreferredHistory();
-
-  // Retrieve and analyze past data
-  if (getCurrentUserUid() != 'none') PastHabitsWidget.retrieveAndAnalyzeData();
 
   runApp(const ChronosculptApp());
 }
@@ -48,6 +50,18 @@ Future<void> _initializeAuthentication() async {
 
   // Check to see if a temp user session is active
   await SharedPreferencesHelper().getTempUid();
+}
+
+Future<void> _initializeNetwork() async {
+  if (initialized) return;
+
+  // Awaken database if asleep
+  await DatabaseHelper().wakeUpDatabase();
+
+  // Retrieve and analyze past data
+  if (getCurrentUserUid() != 'none') await PastHabitsWidget.retrieveAndAnalyzeData();
+
+  initialized = true;
 }
 
 /// Returns the user ID of the currently logged in user.
@@ -75,7 +89,7 @@ class ChronosculptApp extends StatelessWidget {
       seedColor: const Color.fromARGB(255, 174, 85, 196),
       surface: const Color.fromARGB(255, 247, 239, 243),
     );
-
+    
     return MaterialApp(
       title: 'Chronosculpt',
       theme: ThemeData(
@@ -113,126 +127,134 @@ class MainWidget extends StatefulWidget {
 
 class _MainWidgetState extends State<MainWidget> {
   var selectedIndex = 0;
-  var dataLoaded = false;
   Key _historyKey = UniqueKey();
 
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
 
-    if (!FirebaseHelper().authenticated() && tempUid == null) {
-      return const SplashWidget();
-    }
+    return FutureBuilder(
+      future: _initializeNetwork(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const LoadingScreen();
+        }
 
-    Widget page;
-    String appBarText = '';
-    Color appBarColor = Colors.transparent;
-    Color textColor = Colors.transparent;
-    switch (selectedIndex) {
-      case 0:
-        page = const LogWidgetWrapper();
-        appBarText = "Log";
-        appBarColor = colorScheme.secondary;
-        textColor = colorScheme.surface;
-        break;
-      case 1:
-        page = const InteractiveSchedulerWrapper();
-        appBarText = "Interactive Scheduler";
-        appBarColor = colorScheme.surface;
-        textColor = colorScheme.secondary;
-        break;
-      case 2:
-        page = const HabitListWrapper();
-        appBarText = "Habit List";
-        appBarColor = colorScheme.surface;
-        textColor = colorScheme.secondary;
-        break;
-      case 3:
-        page = HistoryWidgetWrapper(
-          key: _historyKey,
-        );
-        appBarText = "History";
-        appBarColor = colorScheme.secondary;
-        textColor = colorScheme.surface;
-        break;
-      default:
-        page = const ErrorScreen(message: '404 Page Not Found');
-        break;
-    }
+        if (!FirebaseHelper().authenticated() && tempUid == null) {
+          return const SplashWidget();
+        }
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: appBarColor,
-        centerTitle: true,
-        title: Text(
-          appBarText,
-          style: TextStyle(color: textColor),
-        ),
-        actions: [
-          selectedIndex == 3
-              ? HistoryPopupMenu(
-                  value: historyPreference,
-                  refresher: () => setState(() {
-                    _historyKey = UniqueKey();
-                  }),
-                )
-              : const SizedBox(),
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MyProfileScreen(
-                      refresher: () => setState(() {}),
-                    ),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: textColor),
-              child: Icon(Icons.person, color: appBarColor),
+        Widget page;
+        String appBarText = '';
+        Color appBarColor = Colors.transparent;
+        Color textColor = Colors.transparent;
+        switch (selectedIndex) {
+          case 0:
+            page = const LogWidgetWrapper();
+            appBarText = "Log";
+            appBarColor = colorScheme.secondary;
+            textColor = colorScheme.surface;
+            break;
+          case 1:
+            page = const InteractiveSchedulerWrapper();
+            appBarText = "Interactive Scheduler";
+            appBarColor = colorScheme.surface;
+            textColor = colorScheme.secondary;
+            break;
+          case 2:
+            page = const HabitListWrapper();
+            appBarText = "Habit List";
+            appBarColor = colorScheme.surface;
+            textColor = colorScheme.secondary;
+            break;
+          case 3:
+            page = HistoryWidgetWrapper(
+              key: _historyKey,
+            );
+            appBarText = "History";
+            appBarColor = colorScheme.secondary;
+            textColor = colorScheme.surface;
+            break;
+          default:
+            page = const ErrorScreen(message: '404 Page Not Found');
+            break;
+        }
+
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: appBarColor,
+            centerTitle: true,
+            title: Text(
+              appBarText,
+              style: TextStyle(color: textColor),
             ),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: page,
-          ),
-          BottomNavigationBar(
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
-            type: BottomNavigationBarType.fixed,
-            selectedFontSize: 12.5,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.create),
-                label: 'Interactive Scheduler',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.build),
-                label: 'Log',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.receipt),
-                label: 'Habits List',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.library_books),
-                label: 'Past Records',
+            actions: [
+              selectedIndex == 3
+                  ? HistoryPopupMenu(
+                      value: historyPreference,
+                      refresher: () => setState(() {
+                        _historyKey = UniqueKey();
+                      }),
+                    )
+                  : const SizedBox(),
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MyProfileScreen(
+                          refresher: () => setState(() {}),
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(backgroundColor: textColor),
+                  child: Icon(Icons.person, color: appBarColor),
+                ),
               ),
             ],
-            currentIndex: selectedIndex,
-            onTap: (value) {
-              setState(() {
-                selectedIndex = value;
-              });
-            },
           ),
-        ],
-      ),
+          body: Column(
+            children: [
+              Expanded(
+                child: page,
+              ),
+              BottomNavigationBar(
+                showSelectedLabels: false,
+                showUnselectedLabels: false,
+                type: BottomNavigationBarType.fixed,
+                selectedFontSize: 12.5,
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.create),
+                    label: 'Interactive Scheduler',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.build),
+                    label: 'Log',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.receipt),
+                    label: 'Habits List',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.library_books),
+                    label: 'Past Records',
+                  ),
+                ],
+                currentIndex: selectedIndex,
+                onTap: (value) {
+                  setState(() {
+                    selectedIndex = value;
+                  });
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

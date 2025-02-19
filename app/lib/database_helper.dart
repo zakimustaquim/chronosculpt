@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chronosculpt/main.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -47,8 +49,11 @@ class DatabaseHelper {
   }
 
   Future<List<Record>> getPastRecords(String uid) async {
-    int daysPast = historyPreference; // retrieve from global variable in main.dart
-    var date = daysPast == 0 ? DateTime(2000) : DateTime.now().subtract(Duration(days: daysPast + 1));
+    int daysPast =
+        historyPreference; // retrieve from global variable in main.dart
+    var date = daysPast == 0
+        ? DateTime(2000)
+        : DateTime.now().subtract(Duration(days: daysPast + 1));
     var recordsList =
         await getRecordsByTimestamp(uid, date.millisecondsSinceEpoch);
     recordsList
@@ -65,7 +70,9 @@ class DatabaseHelper {
       recordsList.removeWhere((element) =>
           element.date.day == d.day && element.date.month == d.month);
     }
-    recordsList.sort((a, b) => b.date.compareTo(a.date),);
+    recordsList.sort(
+      (a, b) => b.date.compareTo(a.date),
+    );
     return recordsList;
   }
 
@@ -132,10 +139,13 @@ class DatabaseHelper {
     final DateTime date = DateTime.now();
     var startOfDay =
         DateTime(date.year, date.month, date.day).add(const Duration(hours: 4));
-    if (date.hour < 4) startOfDay = startOfDay.subtract(const Duration(days: 1));
+    if (date.hour < 4) {
+      startOfDay = startOfDay.subtract(const Duration(days: 1));
+    }
     final timestamp = startOfDay.millisecondsSinceEpoch;
 
-    final response = await http.post(Uri.parse('$backendPath/records/$uid/$timestamp/'));
+    final response =
+        await http.post(Uri.parse('$backendPath/records/$uid/$timestamp/'));
     checkResponse(response);
 
     final Map<String, dynamic> data = json.decode(response.body);
@@ -179,6 +189,31 @@ class DatabaseHelper {
       errorCode: response.statusCode,
       invalidValue: response.body,
     );
+  }
+
+  Future<void> wakeUpDatabase() async {
+    bool isRunning = true;
+
+    // Try to wake up the database for 15 seconds;
+    // if by that point it has not woken up, stop trying.
+    Future.delayed(const Duration(seconds: 15), () {
+      isRunning = false;
+    });
+
+    while (isRunning) {
+      try {
+        final response = await http
+            .get(Uri.parse('$backendPath/wakeup'))
+            .timeout(const Duration(seconds: 1));
+        if (response.statusCode == 200) isRunning = false;
+        await Future.delayed(const Duration(milliseconds: 250));
+      } on TimeoutException {
+        // Request timed out, try again
+        continue;
+      } catch (e) {
+        continue;
+      }
+    }
   }
 }
 

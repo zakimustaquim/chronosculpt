@@ -190,7 +190,7 @@ class _LoginSignupButtonsState extends State<LoginSignupButtons> {
           const SizedBox(height: 16.0),
           Tooltip(
             verticalOffset: 24.0,
-            message: 'Your session ID will persist in this browser only.',
+            message: _visible ? 'Your session ID will persist in this browser only.' : '',
             child: ElevatedButton(
                   onPressed: () => _startActivity('Guest'),
                   child: Text(
