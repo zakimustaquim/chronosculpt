@@ -1,5 +1,6 @@
 import 'package:chronosculpt/main.dart';
 import 'package:chronosculpt/shared_preferences_helper.dart';
+import 'package:chronosculpt/widgets/history.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:chronosculpt/firebase_helper.dart';
@@ -398,6 +399,7 @@ class _LoginScreenState extends State<LoginScreen> {
         .logIn(_emailController.text, _passController.text, context);
 
     if (getCurrentUserUid() != 'none') {
+      PastHabitsWidget.retrieveAndAnalyzeData();
       if (!_rememberMe) SharedPreferencesHelper().setToForget();
       Navigator.pushAndRemoveUntil(
         context,
