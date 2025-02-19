@@ -1,5 +1,5 @@
 # Chronosculpt
-<img width="259" alt="main" src="https://github.com/user-attachments/assets/c6b0b7bc-1b8f-42ba-9c8b-895f250aa7d9" />
+<img width="259" alt="main" src="https://github.com/user-attachments/assets/a7f69584-86b9-469c-8b07-d6f33f3d0bd9" />
 
 ## Overview
 Chronosculpt is a full-stack web &amp; mobile habit tracking app built to empower users to achieve their goals through consistent progress. It is currently deployed on the web [here](https://chronosculpt.web.app) and will soon be available on the iOS App Store.
