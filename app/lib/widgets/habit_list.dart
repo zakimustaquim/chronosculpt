@@ -184,7 +184,15 @@ class _HabitListWidgetState extends State<HabitListWidget> {
           ),
           Expanded(
             child: widget.habits.isEmpty
-                ? const Center(child: Text('No habits found'))
+                ? Center(
+                    child: Text(
+                      'No habits found',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: colorScheme.secondary,
+                      ),
+                    ),
+                  )
                 : ListView.builder(
                     itemCount: widget.habits.length,
                     itemBuilder: (context, i) {

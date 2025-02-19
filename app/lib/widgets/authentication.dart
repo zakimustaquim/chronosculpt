@@ -125,14 +125,28 @@ class _LoginSignupButtonsState extends State<LoginSignupButtons> {
           builder: (context) => const SignupScreen(),
         ),
       );
-    } else {
+    } else if (type == 'Login') {
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => const LoginScreen(),
         ),
       );
+    } else if (type == 'Guest') {
+      tempUid = _generateTempUid();
+      Navigator.pushAndRemoveUntil( 
+        context,
+        MaterialPageRoute(builder: (context) => const MainWidget()),
+        (Route<dynamic> route) => false, // Removes all previous routes
+      );
     }
+  }
+
+  String _generateTempUid() {
+    DateTime date = DateTime.now();
+    var id = 'guest-${date.millisecondsSinceEpoch}';
+    SharedPreferencesHelper().setTempUid(id);
+    return id;
   }
 
   @override
@@ -172,6 +186,18 @@ class _LoginSignupButtonsState extends State<LoginSignupButtons> {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 16.0),
+          Tooltip(
+            verticalOffset: 24.0,
+            message: 'Your session ID will persist in this browser only.',
+            child: ElevatedButton(
+                  onPressed: () => _startActivity('Guest'),
+                  child: Text(
+                    'Continue as Guest',
+                    style: TextStyle(color: colorScheme.secondary),
+                  ),
+                ),
           ),
           const SizedBox(height: 48.0),
           const AboutButton(),

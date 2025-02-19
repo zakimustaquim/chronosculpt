@@ -53,9 +53,11 @@ class _InteractiveSchedulerWrapperState
               }
 
               if (snapshot.data!.isEmpty) {
-                return NoRecordFoundWidget(refresher: () {
-                  setState(() {});
-                });
+                return NoRecordFoundWidget(
+                  refresher: () {
+                    setState(() {});
+                  },
+                );
               }
 
               return InteractiveSchedulerWidget(

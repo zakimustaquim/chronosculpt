@@ -89,7 +89,7 @@ class Dialogs {
                   ),
                   SizedBox(
                     width: MediaQuery.of(context).size.width *
-                        (isMobile ? 0.025 : 0.5),
+                        (isMobile ? 0.025 : 0.05),
                   ),
                   Expanded(
                     flex: 3,

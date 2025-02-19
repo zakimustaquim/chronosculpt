@@ -1,4 +1,5 @@
 import 'package:chronosculpt/firebase_helper.dart';
+import 'package:chronosculpt/shared_preferences_helper.dart';
 import 'package:flutter/material.dart';
 
 class MyProfileScreen extends StatelessWidget {
@@ -20,6 +21,7 @@ class MyProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
     var style = TextStyle(color: colorScheme.secondary);
+    final bool signedIn = FirebaseHelper().authenticated();
 
     return Scaffold(
       appBar: AppBar(
@@ -40,45 +42,57 @@ class MyProfileScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ExpansionTile(
-                  title: Text(
-                    'Change Email',
-                    style: style,
+                IgnorePointer(
+                  ignoring: !signedIn,
+                  child: Opacity(
+                    opacity: signedIn ? 1.0 : 0.5,
+                    child: ExpansionTile(
+                      title: Text(
+                        'Change Email',
+                        style: style,
+                      ),
+                      children: [
+                        const SizedBox(
+                          height: 8.0,
+                        ),
+                        const Text(
+                            'You will be required to verify your email before signing in again.'),
+                        const SizedBox(
+                          height: 8.0,
+                        ),
+                        TwoFieldsForm(
+                          obscurefield1: false,
+                          obscurefield2: true,
+                          field1Text: 'New Email',
+                          field2Text: 'Password',
+                          onSubmit: (field1, field2) =>
+                              _changeEmail(field1, field2, context),
+                        ),
+                      ],
+                    ),
                   ),
-                  children: [
-                    const SizedBox(
-                      height: 8.0,
-                    ),
-                    const Text(
-                        'You will be required to verify your email before signing in again.'),
-                    const SizedBox(
-                      height: 8.0,
-                    ),
-                    TwoFieldsForm(
-                      obscurefield1: false,
-                      obscurefield2: true,
-                      field1Text: 'New Email',
-                      field2Text: 'Password',
-                      onSubmit: (field1, field2) =>
-                          _changeEmail(field1, field2, context),
-                    ),
-                  ],
                 ),
-                ExpansionTile(
-                  title: Text(
-                    'Change Password',
-                    style: style,
-                  ),
-                  children: [
-                    TwoFieldsForm(
-                      obscurefield1: true,
-                      obscurefield2: true,
-                      field1Text: 'Old Password',
-                      field2Text: 'New Password',
-                      onSubmit: (field1, field2) =>
-                          _changePassword(field1, field2, context),
+                IgnorePointer(
+                  ignoring: !signedIn,
+                  child: Opacity(
+                    opacity: signedIn ? 1.0 : 0.5,
+                    child: ExpansionTile(
+                      title: Text(
+                        'Change Password',
+                        style: style,
+                      ),
+                      children: [
+                        TwoFieldsForm(
+                          obscurefield1: true,
+                          obscurefield2: true,
+                          field1Text: 'Old Password',
+                          field2Text: 'New Password',
+                          onSubmit: (field1, field2) =>
+                              _changePassword(field1, field2, context),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
                 ExpansionTile(
                   title: Text(
@@ -88,13 +102,17 @@ class MyProfileScreen extends StatelessWidget {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          await FirebaseHelper().signOut();
-                          refresher();
-                          if (context.mounted) Navigator.of(context).pop();
-                        },
-                        child: const Text('Sign Out'),
+                      child: Tooltip(
+                        message: signedIn ? '' : 'Warning: you are a guest. Data will be permanently deleted!',
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            await FirebaseHelper().signOut();
+                            await SharedPreferencesHelper().removeTempUid();
+                            refresher();
+                            if (context.mounted) Navigator.of(context).pop();
+                          },
+                          child: const Text('Sign Out'),
+                        ),
                       ),
                     )
                   ],

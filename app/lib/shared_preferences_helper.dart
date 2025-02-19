@@ -57,4 +57,33 @@ class SharedPreferencesHelper {
       // Do nothing
     }
   }
+
+  Future<void> setTempUid(String uid) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('tempUid', uid);
+    } catch (_) {
+      // Do nothing
+    }
+  }
+
+  Future<void> removeTempUid() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.remove('tempUid');
+      tempUid = null;
+    } catch (_) {
+      // Do nothing
+    }
+  }
+
+  Future<void> getTempUid() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? uid = prefs.getString('tempUid');
+      tempUid = uid;
+    } catch (_) {
+      // Do nothing
+    }
+  }
 }

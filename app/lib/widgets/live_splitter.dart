@@ -4,6 +4,7 @@ import 'package:chronosculpt/data_structures.dart';
 import 'package:chronosculpt/database_helper.dart';
 import 'package:chronosculpt/main.dart';
 import 'package:chronosculpt/widgets/history.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 /// Displays a list of entries as a reorderable list
@@ -505,7 +506,7 @@ class _LiveSplitTileState extends State<LiveSplitTile> {
   Widget _getStatusWidget(ColorScheme scheme) {
     switch (widget.unit.status) {
       case LiveSplitStatus.waiting:
-        return Icon(Icons.more_horiz, color: scheme.secondary);
+        return Icon(CupertinoIcons.zzz, color: scheme.secondary);
       case LiveSplitStatus.inProgress:
         return Text(
           formatSplit(widget.unit.elapsed.inMilliseconds * 1.0),

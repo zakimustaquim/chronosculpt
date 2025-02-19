@@ -16,16 +16,17 @@ import 'package:flutter/material.dart';
 /// to read from the database for the history widget.
 int historyPreference = 30;
 
+/// Global variable that stores the temp user ID is
+/// "continue as guest" was selected.
+String? tempUid;
+
 /// Before running the app, initialize Firebase
 /// and sign out if the user requested it on login.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize authentication
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  await SharedPreferencesHelper().forgetIfRequested();
+  // Initialize all authentication and Firebase services
+  await _initializeAuthentication();
 
   // Retrieve history preference (stores in global variable)
   await SharedPreferencesHelper().getPreferredHistory();
@@ -36,8 +37,23 @@ void main() async {
   runApp(const ChronosculptApp());
 }
 
+Future<void> _initializeAuthentication() async {
+  // Initialize Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Forget user if "remember me" not checked
+  await SharedPreferencesHelper().forgetIfRequested();
+
+  // Check to see if a temp user session is active
+  await SharedPreferencesHelper().getTempUid();
+}
+
 /// Returns the user ID of the currently logged in user.
 String getCurrentUserUid() {
+  if (tempUid != null) return tempUid!;
+
   var currentUser = FirebaseAuth.instance.currentUser;
   return currentUser?.uid ?? 'none';
 }
@@ -104,7 +120,7 @@ class _MainWidgetState extends State<MainWidget> {
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
 
-    if (!FirebaseHelper().authenticated()) {
+    if (!FirebaseHelper().authenticated() && tempUid == null) {
       return const SplashWidget();
     }
 
