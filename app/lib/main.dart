@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chronosculpt/database_helper.dart';
 import 'package:chronosculpt/firebase_helper.dart';
 import 'package:chronosculpt/firebase_options.dart';
@@ -24,6 +26,10 @@ String? tempUid;
 /// Global variable that stores the whether the app
 /// has been initialized.
 bool initialized = false;
+
+/// Timer that pings the database once every 4 minutes while
+/// active to ensure that the database does not fall asleep.
+Timer? stayAwake;
 
 /// Before running the app, initialize Firebase
 /// and sign out if the user requested it on login.
@@ -59,7 +65,14 @@ Future<void> _initializeNetwork() async {
   await DatabaseHelper().wakeUpDatabase();
 
   // Retrieve and analyze past data
-  if (getCurrentUserUid() != 'none') await PastHabitsWidget.retrieveAndAnalyzeData();
+  if (getCurrentUserUid() != 'none') {
+    await PastHabitsWidget.retrieveAndAnalyzeData();
+  }
+
+  // Start the stay awake timer
+  stayAwake = Timer.periodic(const Duration(minutes: 4), (timer) async {
+    await DatabaseHelper().wakeUpDatabase();
+  });
 
   initialized = true;
 }
@@ -89,7 +102,7 @@ class ChronosculptApp extends StatelessWidget {
       seedColor: const Color.fromARGB(255, 174, 85, 196),
       surface: const Color.fromARGB(255, 247, 239, 243),
     );
-    
+
     return MaterialApp(
       title: 'Chronosculpt',
       theme: ThemeData(
