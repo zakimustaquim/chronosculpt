@@ -416,6 +416,14 @@ class _LiveSplitTileState extends State<LiveSplitTile> {
       color: colorScheme.secondary,
       fontSize: 11.0,
     );
+    const blankTextStyle = TextStyle(
+      color: Color.fromRGBO(1, 1, 1, 0),
+      fontSize: 16.0,
+    );
+    const blankLabelStyle = TextStyle(
+      color: Color.fromRGBO(1, 1, 1, 0),
+      fontSize: 11.0,
+    );
 
     String averageSplitText = widget.unit.averageSplit == 0
         ? ''
@@ -462,26 +470,34 @@ class _LiveSplitTileState extends State<LiveSplitTile> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      averageSplitText.isEmpty
-                          ? const SizedBox()
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(averageSplitText, style: textStyle),
-                                Text('AS', style: labelStyle),
-                              ],
-                            ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(averageSplitText,
+                              style: averageSplitText.isEmpty
+                                  ? blankTextStyle
+                                  : textStyle),
+                          Text('AS',
+                              style: averageSplitText.isEmpty
+                                  ? blankLabelStyle
+                                  : labelStyle),
+                        ],
+                      ),
                       const SizedBox(width: 12.0),
-                      minSplitText.isEmpty
-                          ? const SizedBox()
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(minSplitText, style: textStyle),
-                                Text('PB', style: labelStyle),
-                              ],
-                            ),
-                      const SizedBox(width: 8.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(minSplitText,
+                              style: minSplitText.isEmpty
+                                  ? blankTextStyle
+                                  : textStyle),
+                          Text('PB',
+                              style: minSplitText.isEmpty
+                                  ? blankLabelStyle
+                                  : labelStyle),
+                        ],
+                      ),
+                      const SizedBox(width: 12.0),
                       _getStatusWidget(colorScheme),
                       const SizedBox(width: 4.0),
                       Container(
