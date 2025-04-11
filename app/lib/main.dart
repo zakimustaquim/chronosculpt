@@ -150,7 +150,9 @@ class _MainWidgetState extends State<MainWidget> {
       future: _initializeNetwork(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const LoadingScreen();
+          return LoadingScreen(
+            isAwakening: !initialized,
+          );
         }
 
         if (!FirebaseHelper().authenticated() && tempUid == null) {

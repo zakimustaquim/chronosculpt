@@ -2,11 +2,33 @@ import 'package:flutter/material.dart';
 
 /// Boilerplate loading screen.
 class LoadingScreen extends StatelessWidget {
-  const LoadingScreen({super.key});
+  final bool isAwakening;
+  const LoadingScreen({super.key, this.isAwakening = false});
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: CircularProgressIndicator());
+    if (!isAwakening) {
+      return const Center(child: CircularProgressIndicator());
+    } else {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(
+                "Waking up the database...",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.secondary,
+                  fontSize: 18,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
   }
 }
 
